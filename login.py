@@ -38,6 +38,7 @@ def token_required(f):
 
     return decorated
 
+
 # route for loging user in
 @login.route('/login', methods=['POST'])
 def _login():
@@ -71,7 +72,7 @@ def _login():
             'exp': datetime.utcnow() + timedelta(minutes=30)
         }, app.config['SECRET_KEY'])
 
-        return make_response(jsonify({'token': token.decode('utf-8')}), 201)
+        return make_response(jsonify({'token': token}), 201)
     # returns 403 if password is wrong
     return make_response(
         'Could not verify',
