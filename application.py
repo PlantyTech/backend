@@ -7,6 +7,7 @@ from datetime import datetime
 
 app.register_blueprint(login)
 
+
 def dict_factory(cursor, row):
     d = {}
     for idx, col in enumerate(cursor.description):
@@ -41,7 +42,6 @@ def get_all_users(current_user):
         })
 
     return jsonify({'users': output})
-
 
 
 @app.route('/api/all', methods=['GET'])
