@@ -13,7 +13,7 @@ class User(db.Model):
     image = db.relationship("Image", back_populates="user")
     notification = db.relationship("Notification", back_populates="user")
     comanda = db.relationship("Comanda", back_populates="user")
-    detalii_comada = db.relationship("Detalii_Comanda", back_populates="user")
+    detaliicomanda = db.relationship("DetaliiComanda", back_populates="user")
 
 
 class Image(db.Model):
@@ -26,6 +26,7 @@ class Image(db.Model):
     data1 = db.Column(db.DateTime)
     data2 = db.Column(db.DateTime)
     categorie = db.Column(db.String(80), nullable=False)
+    user = db.relationship("User", back_populates="image")
 
 
 class Notification(db.Model):
@@ -35,7 +36,7 @@ class Notification(db.Model):
     titlu = db.Column(db.String(80), nullable=False)
     text = db.Column(db.String)
     data = db.Column(db.DateTime)
-    citit = db.Column(db.Bool, nullable=False)
+    citit = db.Column(db.Boolean, nullable=False)
     categorie = db.Column(db.String(80))
     user = db.relationship("User", back_populates="notification")
 
@@ -73,8 +74,8 @@ class Comanda(db.Model):
     total_pret = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(80), nullable=False)
     data1 = db.Column(db.DateTime)
-    detalii_comanda_id_l = db.Column(db.Integer, db.ForeignKey('detalii_comanda.detalii_comanda_id'), nullable=False)
-    detalii_comanda_id_f = db.Column(db.Integer, db.ForeignKey('detalii_comanda.detalii_comanda_id'), nullable=False)
+    detaliicomanda_id_l = db.Column(db.Integer, db.ForeignKey('detaliicomanda.detaliicomanda_id'), nullable=False)
+    detaliicomanda_id_f = db.Column(db.Integer, db.ForeignKey('detaliicomanda.detaliicomanda_id'), nullable=False)
     mod_plata = db.Column(db.String(80))
     user = db.relationship("User", back_populates="comanda")
     produse_comandate = db.relationship("Produse_Comandate", back_populates="comanda")
@@ -90,9 +91,9 @@ class Produse_Comandate(db.Model):
     produs = db.relationship("Produs", back_populates="produse_comandate")
 
 
-class Detalii_Comanda(db.Model):
-    __tablename__ = 'detalii_comanda'
-    detalii_comanda_id = db.Column(db.Integer, primary_key=True)
+class DetaliiComanda(db.Model):
+    __tablename__ = 'detaliicomanda'
+    detaliicomanda_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
     tip_comanda = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(70))
@@ -106,7 +107,7 @@ class Detalii_Comanda(db.Model):
     bloc = db.Column(db.String(30))
     scara = db.Column(db.String(30))
     apartament = db.Column(db.String(30))
-    user = db.relationship("User", back_populates="detalii_comanda")
+    user = db.relationship("User", back_populates="detaliicomanda")
 
 
 class Fitofarmacii(db.Model):

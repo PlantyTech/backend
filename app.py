@@ -8,7 +8,7 @@ app = Flask(__name__)
 # configuration
 # NEVER HARDCODE YOUR CONFIGURATION IN YOUR CODE
 # INSTEAD CREATE A .env FILE AND STORE IN IT
-app.config['SECRET_KEY'] = 'ana are mere'
+app.config['SECRET_KEY'] = 'Plantai_01'
 # database name
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True

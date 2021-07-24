@@ -23,7 +23,7 @@ def home():
 
 # User Database Route
 # this route sends back list of users users
-@login.route('/user', methods=['GET'])
+@app.route('/users', methods=['GET'])
 @token_required
 def get_all_users(current_user):
     # querying the database
@@ -36,9 +36,10 @@ def get_all_users(current_user):
         # appending the user data json
         # to the response list
         output.append({
-            'public_id': user.public_id,
             'name': user.name,
-            'email': user.email
+            'email': user.email,
+            'telefon': user.telefon,
+            'locatie': user.locatie
         })
 
     return jsonify({'users': output})
@@ -51,13 +52,14 @@ def api_all(current_user):
     output = []
     for image in images:
         output.append({
-            'id': image.id,
+            'image_id': image.image_id,
+            'user_id': image.user_id,
             'image': image.image,
-            'client': image.client,
             'disease': image.disease,
             'treatment': image.treatment,
             'data1': image.data1,
-            'data2': image.data2
+            'data2': image.data2,
+            'categorie': image.categorie
         })
 
     return jsonify({'images': output})
@@ -68,26 +70,20 @@ def api_all(current_user):
 def api_add(current_user):
     data = request.json
 
-    client, image = data.get('client'), data.get('image')
+    user_id, image, categorie = current_user.user_id, data.get('image'), data.get('categorie')
 
     data1 = datetime.now()
 
     # database ORM object
     image = Image(
         image=image,
-        client=client,
+        user_id=user_id,
         disease=None,
         treatment=None,
         data1=data1,
-        data2=None
+        data2=None,
+        categorie=categorie
     )
-    '''
-    user = User.query \
-        .filter_by(name=client) \
-        .first()
-
-    user.image.append(image)
-    '''
     # insert user
     db.session.add(image)
     db.session.commit()
@@ -95,16 +91,16 @@ def api_add(current_user):
     return "success"
 
 
-@app.route('/api/update', methods=['GET'])
+@app.route('/api/update', methods=['POST'])
 @token_required
 def api_update(current_user):
     data = request.json
 
-    img_id, disease, treatment = data.get('id'), data.get('disease'), data.get('treatment')
+    image_id, disease, treatment = data.get('image_id'), data.get('disease'), data.get('treatment')
 
     data2 = datetime.now()
 
-    Image.query.filter_by(id=img_id).update({"disease": disease, "treatment": treatment, "data2": data2})
+    Image.query.filter_by(image_id=image_id).update({"disease": disease, "treatment": treatment, "data2": data2})
 
     db.session.commit()
 
@@ -121,25 +117,26 @@ def page_not_found(e):
 def api_get(current_user):
     data = request.json
 
-    client = data.get('client')
+    user_id = current_user.user_id
 
     db.session.commit()
 
-    if not (id or client):
+    if not (id or user_id):
         return page_not_found(404)
 
-    images = Image.query.filter_by(client=client)
+    images = Image.query.filter_by(user_id=user_id)
 
     output = []
     for image in images:
         output.append({
-            'id': image.id,
+            'image_id': image.image_id,
+            'user_id': image.user_id,
             'image': image.image,
-            'client': image.client,
             'disease': image.disease,
             'treatment': image.treatment,
             'data1': image.data1,
-            'data2': image.data2
+            'data2': image.data2,
+            'categorie': image.categorie
         })
 
     return jsonify({'images': output})

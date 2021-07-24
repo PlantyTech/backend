@@ -27,9 +27,10 @@ def token_required(f):
             # decoding the payload to fetch the stored details
             data = jwt.decode(token, app.config['SECRET_KEY'])
             current_user = User.query \
-                .filter_by(public_id=data['public_id']) \
+                .filter_by(user_id=data['user_id']) \
                 .first()
-        except:
+        except Exception as e:
+            print(e)
             return jsonify({
                 'message': 'Token is invalid !!'
             }), 401
@@ -40,7 +41,7 @@ def token_required(f):
 
 
 # route for loging user in
-@login.route('/login', methods=['POST'])
+@login.route('/login', methods=['GET'])
 def _login():
     # creates dictionary of form data
     auth = request.json
@@ -68,7 +69,7 @@ def _login():
     if check_password_hash(user.password, auth.get('password')):
         # generates the JWT Token
         token = jwt.encode({
-            'public_id': user.public_id,
+            'user_id': user.user_id,
             'exp': datetime.utcnow() + timedelta(minutes=120)
         }, app.config['SECRET_KEY'])
 
@@ -90,6 +91,7 @@ def signup():
     # gets name, email and password
     name, email = data.get('name'), data.get('email')
     password = data.get('password')
+    telefon, locatie = data.get('telefon'), data.get('locatie')
 
     # checking for existing user
     user = User.query \
@@ -98,10 +100,11 @@ def signup():
     if not user:
         # database ORM object
         user = User(
-            public_id=str(uuid.uuid4()),
             name=name,
             email=email,
-            password=generate_password_hash(password)
+            password=generate_password_hash(password),
+            telefon=telefon,
+            locatie=locatie
         )
         # insert user
         db.session.add(user)
@@ -111,4 +114,3 @@ def signup():
     else:
         # returns 202 if user already exists
         return make_response('User already exists. Please Log in.', 202)
-
