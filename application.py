@@ -23,7 +23,7 @@ def home():
 
 # User Database Route
 # this route sends back list of users users
-@app.route('/users', methods=['GET'])
+@app.route('/api/users', methods=['GET'])
 @token_required
 def get_all_users(current_user):
     # querying the database
@@ -45,7 +45,7 @@ def get_all_users(current_user):
     return jsonify({'users': output})
 
 
-@app.route('/api/all', methods=['GET'])
+@app.route('/api/image/all', methods=['GET'])
 @token_required
 def api_all(current_user):
     images = Image.query.all()
@@ -65,7 +65,7 @@ def api_all(current_user):
     return jsonify({'images': output})
 
 
-@app.route('/api/add', methods=['POST'])
+@app.route('/api/image/add', methods=['POST'])
 @token_required
 def api_add(current_user):
     data = request.json
@@ -91,7 +91,7 @@ def api_add(current_user):
     return "success"
 
 
-@app.route('/api/update', methods=['POST'])
+@app.route('/api/image/update', methods=['POST'])
 @token_required
 def api_update(current_user):
     data = request.json
@@ -112,7 +112,7 @@ def page_not_found(e):
     return "<h1>404</h1><p>The resource could not be found.</p>", 404
 
 
-@app.route('/api/get', methods=['GET'])
+@app.route('/api/image/get', methods=['GET'])
 @token_required
 def api_get(current_user):
     data = request.json
