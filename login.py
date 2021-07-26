@@ -78,8 +78,11 @@ def _login():
             'user_id': user.user_id,
             'exp': datetime.utcnow() + timedelta(minutes=120)
         }, app.config['SECRET_KEY'])
+        try:
+            return make_response(jsonify({'token': token.decode(), "name": user.name, "email": user.email, "telefon": user.telefon}), 201)
+        except:
+            return make_response(jsonify({'token': token, "name": user.name, "email": user.email, "telefon": user.telefon}), 201)
 
-        return make_response(jsonify({'token': token.decode(), "name": user.name, "email": user.email, "telefon": user.telefon}), 201)
     # returns 403 if password is wrong
     return make_response(
         'Could not verify',
