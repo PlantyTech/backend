@@ -3,7 +3,7 @@ from login import login, token_required
 from models import User, Image
 from flask import request, jsonify
 from datetime import datetime
-
+import json
 
 app.register_blueprint(login)
 
@@ -68,7 +68,12 @@ def api_all(current_user):
 @app.route('/api/image/add', methods=['POST'])
 @token_required
 def api_add(current_user):
-    data = request.json
+    if request.json is not None:
+        data = request.json
+    elif request.data is not None:
+        data = json.loads(request.data)
+    else:
+        data = request.args
 
     user_id, image, categorie = current_user.user_id, data.get('image'), data.get('categorie')
 
@@ -94,7 +99,12 @@ def api_add(current_user):
 @app.route('/api/image/update', methods=['POST'])
 @token_required
 def api_update(current_user):
-    data = request.json
+    if request.json is not None:
+        data = request.json
+    elif request.data is not None:
+        data = json.loads(request.data)
+    else:
+        data = request.args
 
     image_id, disease, treatment = data.get('image_id'), data.get('disease'), data.get('treatment')
 
@@ -115,7 +125,12 @@ def page_not_found(e):
 @app.route('/api/image/get', methods=['GET'])
 @token_required
 def api_get(current_user):
-    data = request.json
+    if request.json is not None:
+        data = request.json
+    elif request.data is not None:
+        data = json.loads(request.data)
+    else:
+        data = request.args
 
     user_id = current_user.user_id
 

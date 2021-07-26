@@ -1,6 +1,6 @@
 from flask import Blueprint
 from flask import Flask, request, jsonify, make_response
-import uuid
+import json
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from datetime import datetime, timedelta
@@ -44,7 +44,13 @@ def token_required(f):
 @login.route('/login', methods=['GET'])
 def _login():
     # creates dictionary of form data
-    auth = request.json
+    if request.json is not None:
+        auth = request.json
+    elif request.data is not None:
+        auth = json.loads(request.data)
+
+    else:
+        auth = request.args
 
     if not auth or not auth.get('email') or not auth.get('password'):
         # returns 401 if any email or / and password is missing
@@ -86,7 +92,12 @@ def _login():
 @login.route('/signup', methods=['POST'])
 def signup():
     # creates a dictionary of the form data
-    data = request.json
+    if request.json is not None:
+        data = request.json
+    elif request.data is not None:
+        data = json.loads(request.data)
+    else:
+        data = request.args
 
     # gets name, email and password
     name, email = data.get('name'), data.get('email')
