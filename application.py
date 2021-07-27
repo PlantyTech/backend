@@ -70,7 +70,7 @@ def api_all(current_user):
 def api_add(current_user):
     if request.json is not None:
         data = request.json
-    elif request.data is not None or request.data!=b'':
+    elif request.data is not None and request.data!=b'':
         data = json.loads(request.data)
     else:
         data = request.args
@@ -101,7 +101,7 @@ def api_add(current_user):
 def api_update(current_user):
     if request.json is not None:
         data = request.json
-    elif request.data is not None or request.data!=b'':
+    elif request.data is not None and request.data!=b'':
         data = json.loads(request.data)
     else:
         data = request.args
@@ -127,7 +127,7 @@ def page_not_found(e):
 def api_get(current_user):
     if request.json is not None:
         data = request.json
-    elif request.data is not None or request.data!=b'':
+    elif request.data is not None and request.data!=b'':
         data = json.loads(request.data)
     else:
         data = request.args

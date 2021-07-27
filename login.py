@@ -46,7 +46,7 @@ def _login():
     # creates dictionary of form data
     if request.json is not None:
         auth = request.json
-    elif request.data is not None or request.data!=b'':
+    elif request.data is not None and request.data!=b'':
         auth = json.loads(request.data)
     else:
         auth = request.args
@@ -96,7 +96,7 @@ def signup():
     # creates a dictionary of the form data
     if request.json is not None:
         data = request.json
-    elif request.data is not None or request.data!=b'':
+    elif request.data is not None and request.data!=b'':
         data = json.loads(request.data)
     else:
         data = request.args
