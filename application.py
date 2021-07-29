@@ -68,12 +68,15 @@ def api_all(current_user):
 @app.route('/api/image/add', methods=['POST'])
 @token_required
 def api_add(current_user):
-    if request.json is not None:
-        data = request.json
-    elif request.data is not None and request.data!=b'':
-        data = json.loads(request.data)
-    else:
-        data = request.args
+    try:
+        if request.json is not None:
+            data = request.json
+        elif request.args is not None:
+            data = request.args
+        else:
+            data = json.loads(request.data)
+    except:
+        return "wrong request"
 
     user_id, image, categorie = current_user.user_id, data.get('image'), data.get('categorie')
 
@@ -99,12 +102,15 @@ def api_add(current_user):
 @app.route('/api/image/update', methods=['POST'])
 @token_required
 def api_update(current_user):
-    if request.json is not None:
-        data = request.json
-    elif request.data is not None and request.data!=b'':
-        data = json.loads(request.data)
-    else:
-        data = request.args
+    try:
+        if request.json is not None:
+            data = request.json
+        elif request.args is not None:
+            data = request.args
+        else:
+            data = json.loads(request.data)
+    except:
+        return "wrong request"
 
     image_id, disease, treatment = data.get('image_id'), data.get('disease'), data.get('treatment')
 
@@ -125,12 +131,15 @@ def page_not_found(e):
 @app.route('/api/image/get', methods=['GET'])
 @token_required
 def api_get(current_user):
-    if request.json is not None:
-        data = request.json
-    elif request.data is not None and request.data!=b'':
-        data = json.loads(request.data)
-    else:
-        data = request.args
+    try:
+        if request.json is not None:
+            data = request.json
+        elif request.args is not None:
+            data = request.args
+        else:
+            data = json.loads(request.data)
+    except:
+        return "wrong request"
 
     user_id = current_user.user_id
 

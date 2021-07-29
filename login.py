@@ -44,12 +44,15 @@ def token_required(f):
 @login.route('/login', methods=['GET'])
 def _login():
     # creates dictionary of form data
-    if request.json is not None:
-        auth = request.json
-    elif request.data is not None and request.data!=b'':
-        auth = json.loads(request.data)
-    else:
-        auth = request.args
+    try:
+        if request.json is not None:
+            auth = request.json
+        elif request.args is not None:
+            auth = request.args
+        else:
+            auth = json.loads(request.data)
+    except:
+        return "wrong request"
 
     if not auth or not auth.get('email') or not auth.get('password'):
         # returns 401 if any email or / and password is missing
@@ -96,12 +99,15 @@ def _login():
 @login.route('/signup', methods=['POST'])
 def signup():
     # creates a dictionary of the form data
-    if request.json is not None:
-        data = request.json
-    elif request.data is not None and request.data!=b'':
-        data = json.loads(request.data)
-    else:
-        data = request.args
+    try:
+        if request.json is not None:
+            data = request.json
+        elif request.args is not None:
+            data = request.args
+        else:
+            data = json.loads(request.data)
+    except:
+        return "wrong request"
 
     # gets name, email and password
     name, email = data.get('name'), data.get('email')
