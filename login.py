@@ -25,7 +25,7 @@ def token_required(f):
 
         try:
             # decoding the payload to fetch the stored details
-            data = jwt.decode(token, app.config['SECRET_KEY'])
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = User.query \
                 .filter_by(user_id=data['user_id']) \
                 .first()
@@ -76,7 +76,7 @@ def _login():
         token = jwt.encode({
             'user_id': user.user_id,
             'exp': datetime.utcnow() + timedelta(minutes=120)
-        }, app.config['SECRET_KEY'])
+        }, app.config['SECRET_KEY'], algorithm="HS256")
         try:
             return make_response(jsonify({'token': token.decode(), "name": user.name, "email": user.email, "telefon": user.telefon}), 201)
         except:
