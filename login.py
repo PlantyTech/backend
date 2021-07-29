@@ -78,9 +78,11 @@ def _login():
             'exp': datetime.utcnow() + timedelta(minutes=120)
         }, app.config['SECRET_KEY'], algorithm="HS256")
         try:
-            return make_response(jsonify({'token': token.decode(), "name": user.name, "email": user.email, "telefon": user.telefon}), 201)
+            return make_response(jsonify({'token': token.decode(),
+                                          'userDetails': {"name": user.name, "email": user.email, "telefon": user.telefon}}), 201)
         except:
-            return make_response(jsonify({'token': token, "name": user.name, "email": user.email, "telefon": user.telefon}), 201)
+            return make_response(jsonify({'token': token,
+                                          'userDetails': {"name": user.name, "email": user.email, "telefon": user.telefon}}), 201)
 
     # returns 403 if password is wrong
     return make_response(
