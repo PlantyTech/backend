@@ -33,7 +33,7 @@ def token_required(f):
             print(e)
             return jsonify({
                 'message': 'Token is invalid !!'
-            }), 401
+            }), 403
         # returns the current logged in users contex to the routes
         return f(current_user, *args, **kwargs)
 
@@ -67,10 +67,10 @@ def _login():
         .first()
 
     if not user:
-        # returns 401 if user does not exist
+        # returns 404 if user does not exist
         return make_response(
-            'Could not verify',
-            401,
+            'User not found',
+            404,
             {'WWW-Authenticate': 'Basic realm ="User does not exist !!"'}
         )
 
@@ -89,7 +89,7 @@ def _login():
 
     # returns 403 if password is wrong
     return make_response(
-        'Could not verify',
+        'Forbidden',
         403,
         {'WWW-Authenticate': 'Basic realm ="Wrong Password !!"'}
     )
@@ -134,4 +134,4 @@ def signup():
         return make_response('Successfully registered.', 201)
     else:
         # returns 202 if user already exists
-        return make_response('User already exists. Please Log in.', 202)
+        return make_response('User already exists. Please Log in.', 409)
