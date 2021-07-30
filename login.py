@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 from models import User
 from app import db, app
 from functools import wraps
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 login = Blueprint('login', __name__)
 
@@ -41,7 +43,7 @@ def token_required(f):
 
 
 # route for loging user in
-@login.route('/login', methods=['GET'])
+@login.route('/api/login', methods=['GET'])
 def _login():
     # creates dictionary of form data
     try:
@@ -52,7 +54,7 @@ def _login():
         else:
             auth = json.loads(request.data)
     except:
-        return "wrong request"
+        return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
     if not auth or not auth.get('email') or not auth.get('password'):
         # returns 401 if any email or / and password is missing
@@ -94,9 +96,82 @@ def _login():
         {'WWW-Authenticate': 'Basic realm ="Wrong Password !!"'}
     )
 
+# route for loging user in
+@login.route('/api/login-with-google', methods=['GET'])
+def _login_with_google():
+    # creates dictionary of form data
+    try:
+        if request.json is not None:
+            auth = request.json
+        elif request.args is not None:
+            auth = request.args
+        else:
+            auth = json.loads(request.data)
+    except:
+        return make_response('Request had bad syntax or was impossible to fulfill', 400)
+
+    if not auth or not auth.get('email'):
+        # returns 401 if any email or / and password is missing
+        return make_response(
+            'Could not verify',
+            401,
+            {'WWW-Authenticate': 'Basic realm ="Login required !!"'}
+        )
+
+    try:
+        idToken=auth.get('idToken')
+        idinfo = id_token.verify_oauth2_token(idToken, requests.Request())
+
+        if idinfo['email'] != auth.get('email') or idinfo['sub'] != auth.get('id'):
+            return make_response(
+                'Could not verify',
+                401,
+                {'WWW-Authenticate': 'Basic realm ="User does not exist !!"'}
+            )
+    except:
+        return make_response(
+            'Could not verify',
+            401,
+            {'WWW-Authenticate': 'Basic realm ="User does not exist !!"'}
+        )
+
+    user = User.query \
+        .filter_by(email=auth.get('email')) \
+        .first()
+
+    if not user:
+        # database ORM object
+        user = User(
+            name=auth.get('name'),
+            email=auth.get('email'),
+            password=generate_password_hash("google-password"),
+            telefon=None,
+            locatie=None
+        )
+        # insert user
+        db.session.add(user)
+        db.session.commit()
+
+        user = User.query \
+            .filter_by(email=auth.get('email')) \
+            .first()
+
+    token = jwt.encode({
+        'user_id': user.user_id,
+        'exp': datetime.utcnow() + timedelta(minutes=120)
+    }, app.config['SECRET_KEY'], algorithm="HS256")
+
+    try:
+        return make_response(jsonify({'token': token.decode(),
+                                      'userDetails': {"name": user.name, "email": user.email, "telefon": user.telefon}}), 201)
+    except:
+        return make_response(jsonify({'token': token,
+                                      'userDetails': {"name": user.name, "email": user.email, "telefon": user.telefon}}), 201)
+
+
 
 # signup route
-@login.route('/signup', methods=['POST'])
+@login.route('/api/signup', methods=['POST'])
 def signup():
     # creates a dictionary of the form data
     try:
@@ -107,7 +182,7 @@ def signup():
         else:
             data = json.loads(request.data)
     except:
-        return "wrong request"
+        return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
     # gets name, email and password
     name, email = data.get('name'), data.get('email')

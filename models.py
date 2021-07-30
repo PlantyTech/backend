@@ -8,7 +8,7 @@ class User(db.Model):
     name = db.Column(db.String(100))
     email = db.Column(db.String(70), unique=True)
     password = db.Column(db.String(80))
-    telefon = db.Column(db.String(50), unique=True)
+    telefon = db.Column(db.String(50))
     locatie = db.Column(db.String(100))
     image = db.relationship("Image", back_populates="user")
     notification = db.relationship("Notification", back_populates="user")
