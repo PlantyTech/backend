@@ -67,7 +67,7 @@ class Product_Details(db.Model):
     product = db.relationship("Product", back_populates="product_details")
 
 
-class order(db.Model):
+class Order(db.Model):
     __tablename__ = 'order'
     order_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
