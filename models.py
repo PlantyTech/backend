@@ -9,7 +9,7 @@ class User(db.Model):
     email = db.Column(db.String(70), unique=True)
     password = db.Column(db.String(80))
     phone = db.Column(db.String(50))
-    lacation = db.Column(db.String(100))
+    location = db.Column(db.String(100))
     image = db.relationship("Image", back_populates="user")
     notification = db.relationship("Notification", back_populates="user")
     order = db.relationship("Order", back_populates="user")
