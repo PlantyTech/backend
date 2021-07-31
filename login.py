@@ -84,10 +84,10 @@ def _login():
         }, app.config['SECRET_KEY'], algorithm="HS256")
         try:
             return make_response(jsonify({'token': token.decode(),
-                                          'userDetails': {"name": user.name, "email": user.email, "telefon": user.telefon}}), 201)
+                                          'userDetails': {"name": user.name, "email": user.email, "phone": user.phone}}), 201)
         except:
             return make_response(jsonify({'token': token,
-                                          'userDetails': {"name": user.name, "email": user.email, "telefon": user.telefon}}), 201)
+                                          'userDetails': {"name": user.name, "email": user.email, "phone": user.phone}}), 201)
 
     # returns 403 if password is wrong
     return make_response(
@@ -145,8 +145,8 @@ def _login_with_google():
             name=auth.get('name'),
             email=auth.get('email'),
             password=generate_password_hash("google-password"),
-            telefon=None,
-            locatie=None
+            phone=None,
+            location=None
         )
         # insert user
         db.session.add(user)
@@ -163,10 +163,10 @@ def _login_with_google():
 
     try:
         return make_response(jsonify({'token': token.decode(),
-                                      'userDetails': {"name": user.name, "email": user.email, "telefon": user.telefon}}), 201)
+                                      'userDetails': {"name": user.name, "email": user.email, "phone": user.phone}}), 201)
     except:
         return make_response(jsonify({'token': token,
-                                      'userDetails': {"name": user.name, "email": user.email, "telefon": user.telefon}}), 201)
+                                      'userDetails': {"name": user.name, "email": user.email, "phone": user.phone}}), 201)
 
 
 
@@ -187,7 +187,7 @@ def signup():
     # gets name, email and password
     name, email = data.get('name'), data.get('email')
     password = data.get('password')
-    telefon, locatie = data.get('telefon'), data.get('locatie')
+    phone, location = data.get('phone'), data.get('location')
 
     # checking for existing user
     user = User.query \
@@ -199,8 +199,8 @@ def signup():
             name=name,
             email=email,
             password=generate_password_hash(password),
-            telefon=telefon,
-            locatie=locatie
+            phone=phone,
+            location=location
         )
         # insert user
         db.session.add(user)

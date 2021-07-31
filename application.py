@@ -38,8 +38,8 @@ def get_all_users(current_user):
         output.append({
             'name': user.name,
             'email': user.email,
-            'telefon': user.telefon,
-            'locatie': user.locatie
+            'phone': user.phone,
+            'location': user.location
         })
 
     return jsonify({'users': output})

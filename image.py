@@ -26,7 +26,7 @@ def api_all(current_user):
             'treatment': image.treatment,
             'data1': image.data1,
             'data2': image.data2,
-            'categorie': image.categorie
+            'category': image.category
         })
 
     return jsonify({'images': output})
@@ -45,7 +45,7 @@ def api_add(current_user):
     except:
         return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
-    user_id, image, categorie = current_user.user_id, data.get('image'), data.get('categorie')
+    user_id, image, category = current_user.user_id, data.get('image'), data.get('category')
 
     data1 = datetime.now()
 
@@ -57,7 +57,7 @@ def api_add(current_user):
         treatment=None,
         data1=data1,
         data2=None,
-        categorie=categorie
+        category=category
     )
     # insert user
     db.session.add(image)
@@ -113,7 +113,7 @@ def api_get(current_user):
             'treatment': image.treatment,
             'data1': image.data1,
             'data2': image.data2,
-            'categorie': image.categorie
+            'category': image.category
         })
 
     return jsonify({'images': output})
