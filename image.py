@@ -83,7 +83,7 @@ def api_update(current_user):
 
     data2 = datetime.now()
 
-    Image.query.filter_by(image_id=image_id).update({"disease": disease, "treatment": treatment, "data2": data2})
+    Image.query.get(image_id).update({"disease": disease, "treatment": treatment, "data2": data2})
 
     db.session.commit()
 
@@ -101,7 +101,7 @@ def api_get(current_user):
     if not (id or user_id):
         return page_not_found(404)
 
-    images = Image.query.filter_by(user_id=user_id)
+    images = current_user.image
 
     output = []
     for image in images:

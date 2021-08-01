@@ -3,9 +3,13 @@ from login import login, token_required
 from models import User, Image
 from flask import request, jsonify
 from image import image
+from product import product
+from order import order
 
 app.register_blueprint(login)
 app.register_blueprint(image)
+app.register_blueprint(product)
+app.register_blueprint(order)
 
 
 def dict_factory(cursor, row):
