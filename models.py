@@ -94,7 +94,7 @@ class Ordered_Products(db.Model):
 
 class Orderdetails(db.Model):
     __tablename__ = 'orderdetails'
-    orderdetails_id =   db.Column(db.Integer, primary_key=True)
+    orderdetails_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
     order_type = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(70))
@@ -109,7 +109,6 @@ class Orderdetails(db.Model):
     stairs = db.Column(db.String(30))
     apartment = db.Column(db.String(30))
     user = db.relationship("User", back_populates="orderdetails")
-    order = db.relationship("Order", back_populates="orderdetails")
 
 
 class Phyto(db.Model):
