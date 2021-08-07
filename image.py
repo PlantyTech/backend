@@ -24,8 +24,8 @@ def api_all(current_user):
             'image': image.image,
             'disease': image.disease,
             'treatment': image.treatment,
-            'data1': image.data1,
-            'data2': image.data2,
+            'created_data': image.created_data,
+            'updated_data': image.updated_data,
             'category': image.category
         })
 
@@ -47,7 +47,7 @@ def api_add(current_user):
 
     user_id, image, category = current_user.user_id, data.get('image'), data.get('category')
 
-    data1 = datetime.now()
+    created_data = datetime.now()
 
     # database ORM object
     image = Image(
@@ -55,8 +55,8 @@ def api_add(current_user):
         user_id=user_id,
         disease=None,
         treatment=None,
-        data1=data1,
-        data2=None,
+        created_data=created_data,
+        updated_data=None,
         category=category
     )
     # insert user
@@ -81,9 +81,12 @@ def api_update(current_user):
 
     image_id, disease, treatment = data.get('image_id'), data.get('disease'), data.get('treatment')
 
-    data2 = datetime.now()
+    updated_data = datetime.now()
 
-    Image.query.get(image_id).update({"disease": disease, "treatment": treatment, "data2": data2})
+    image=Image.query.get(image_id)
+    image.disease = disease
+    image.treatment = treatment
+    image.updated_data = updated_data
 
     db.session.commit()
 
@@ -111,8 +114,8 @@ def api_get(current_user):
             'image': image.image,
             'disease': image.disease,
             'treatment': image.treatment,
-            'data1': image.data1,
-            'data2': image.data2,
+            'created_data': image.created_data,
+            'updated_data': image.updated_data,
             'category': image.category
         })
 

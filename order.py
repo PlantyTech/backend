@@ -34,9 +34,9 @@ def api_all(current_user):
             'user_id': order.user_id,
             'total_price': order.total_price,
             'status': order.status,
-            'data1': order.data1,
-            'orderdetails_id_l': order.orderdetails_id_l,
-            'orderdetails_id_f': order.orderdetails_id_f,
+            'created_data': order.created_data,
+            'orderdetails_shipping_id': order.orderdetails_shipping_id,
+            'orderdetails_billing_id': order.orderdetails_billing_id,
             'payment_type': order.payment_type
         })
 
@@ -59,9 +59,9 @@ def api_add(current_user):
     user_id = current_user.user_id
     total_price = data.get('total_price')
     status = "In progres"
-    data1 = datetime.now()
-    orderdetails_id_l = data.get('orderdetails_id_l')
-    orderdetails_id_f = data.get('orderdetails_id_f')
+    created_data = datetime.now()
+    orderdetails_shipping_id = data.get('orderdetails_shipping_id')
+    orderdetails_billing_id = data.get('orderdetails_billing_id')
     payment_type = data.get('payment_type')
 
     # database ORM object
@@ -69,9 +69,9 @@ def api_add(current_user):
         user_id=user_id,
         total_price=total_price,
         status=status,
-        data1=data1,
-        orderdetails_id_l=orderdetails_id_l,
-        orderdetails_id_f=orderdetails_id_f,
+        created_data=created_data,
+        orderdetails_shipping_id=orderdetails_shipping_id,
+        orderdetails_billing_id=orderdetails_billing_id,
         payment_type=payment_type
     )
 
@@ -84,7 +84,7 @@ def api_add(current_user):
         ordered_product = Ordered_Products(
             order_id=order.order_id,
             product_id=product,
-            quantity=product.get(product),
+            quantity=cart.get(product),
         )
 
         # insert user
