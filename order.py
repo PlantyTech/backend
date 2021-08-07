@@ -79,7 +79,7 @@ def api_add(current_user):
     db.session.add(order)
     db.session.commit()
 
-    cart=data.get("cart")# database ORM object
+    cart=json.loads(data.get("cart"))# database ORM object
     for product in cart:
         ordered_product = Ordered_Products(
             order_id=order.order_id,
