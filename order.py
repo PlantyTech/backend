@@ -174,8 +174,8 @@ def api_order_details_add(current_user):
     user_id = current_user.user_id
     order_type = data.get('order_type')
     email = data.get('email')
-    FirstName = data.get('FirstName')
-    SecondName = data.get('SecondName')
+    first_name = data.get('first_name')
+    second_name = data.get('second_name')
     phone = data.get('phone')
     county = data.get('county')
     city = data.get('city')
@@ -190,8 +190,8 @@ def api_order_details_add(current_user):
         user_id=user_id,
         order_type=order_type,
         email=email,
-        FirstName=FirstName,
-        SecondName=SecondName,
+        first_name=first_name,
+        second_name=second_name,
         phone=phone,
         county=county,
         city=city,
@@ -229,8 +229,8 @@ def api_order_details_all(current_user):
             'user_id': orderdetails.user_id,
             'order_type': orderdetails.order_type,
             'email': orderdetails.email,
-            'FirstName': orderdetails.FirstName,
-            'SecondName': orderdetails.SecondName,
+            'first_name': orderdetails.first_name,
+            'second_name': orderdetails.second_name,
             'phone': orderdetails.phone,
             'county': orderdetails.county,
             'city': orderdetails.city,
