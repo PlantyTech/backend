@@ -87,27 +87,25 @@ def api_update(current_user):
         return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
     product_id = data.get('product_id')
-    if product_id is not None:
-        output = {}
+    product=Product.query.get(product_id)
+    if product is not None:
 
         if data.get('producer') is not None and len(data.get('producer')) > 0:
-            output.update({"producer": data.get('producer')})
+            product.producer = data.get('producer')
         if data.get('name') is not None and len(data.get('name')) > 0:
-            output.update({"name": data.get('name')})
+            product.name = data.get('name')
         if data.get('image') is not None and len(data.get('image')) > 0:
-            output.update({"image": data.get('image')})
+            product.image = data.get('image')
         if data.get('description') is not None and len(data.get('description')) > 0:
-            output.update({"description": data.get('description')})
+            product.description = data.get('description')
         if data.get('price') is not None and len(data.get('price')) > 0:
-            output.update({"price": data.get('price')})
+            product.price = data.get('price')
         if data.get('provider') is not None and len(data.get('provider')) > 0:
-            output.update({"provider": data.get('provider')})
+            product.provider = data.get('provider')
         if data.get('stock') is not None and len(data.get('stock')) > 0:
-            output.update({"stock": data.get('stock')})
+            product.stock = data.get('stock')
         if data.get('stock_flag') is not None and len(data.get('stock_flag')) > 0:
-            output.update({"stock_flag": (data.get('stock_flag'))})
-
-        Product.query.get(product_id).update(output)
+            product.stock_flag = data.get('stock_flag')
 
         db.session.commit()
 
