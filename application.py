@@ -5,11 +5,13 @@ from flask import request, jsonify
 from image import image
 from product import product
 from order import order
+from notification import notification
 
 app.register_blueprint(login)
 app.register_blueprint(image)
 app.register_blueprint(product)
 app.register_blueprint(order)
+app.register_blueprint(notification)
 
 
 def dict_factory(cursor, row):

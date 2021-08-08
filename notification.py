@@ -26,7 +26,8 @@ def api_all(current_user):
             'text': notification.text,
             'data': notification.data,
             'read_flag': notification.read_flag,
-            'category': notification.category
+            'category': notification.category,
+            'users': [user.user_id for user in notification.user]
         })
 
     return jsonify({'notifications': output})
@@ -135,6 +136,28 @@ def api_update(current_user):
         notification.read_flag = bool(read_flag)
     if category is not None:
         notification.category = category
+
+    db.session.commit()
+
+    return "success"
+
+
+@notification.route('/api/notification/delete', methods=['DELETE'])
+@token_required
+def api_delete(current_user):
+    try:
+        if request.json is not None:
+            data = request.json
+        elif request.args is not None:
+            data = request.args
+        else:
+            data = json.loads(request.data)
+    except:
+        return make_response('Request had bad syntax or was impossible to fulfill', 400)
+
+    notification_id = data.get('notification_id')
+
+    Notification.query.filter_by(notification_id=notification_id).delete()
 
     db.session.commit()
 
