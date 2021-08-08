@@ -1,6 +1,11 @@
 from app import db
 # Database ORMs
 
+ItemNotification = db.Table('ItemDetail',
+                            db.Column('id', db.Integer, primary_key=True),
+                            db.Column('user_id', db.Integer, db.ForeignKey('user.user_id')),
+                            db.Column('notification_id', db.Integer, db.ForeignKey('notification.notification_id')))
+
 
 class User(db.Model):
     __tablename__ = 'user'
@@ -10,8 +15,10 @@ class User(db.Model):
     password = db.Column(db.String(80))
     phone = db.Column(db.String(50))
     location = db.Column(db.String(100))
+    notification_token = db.Column(db.String(200))
+    last_login = db.Column(db.DateTime)
     image = db.relationship("Image", back_populates="user")
-    notification = db.relationship("Notification", back_populates="user")
+    notification = db.relationship("Notification", secondary=ItemNotification, back_populates="user")
     order = db.relationship("Order", back_populates="user")
     orderdetails = db.relationship("Orderdetails", back_populates="user")
 
@@ -32,13 +39,12 @@ class Image(db.Model):
 class Notification(db.Model):
     __tablename__ = 'notification'
     notification_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
     title = db.Column(db.String(80), nullable=False)
     text = db.Column(db.String)
     data = db.Column(db.DateTime)
     read_flag = db.Column(db.Boolean, nullable=False)
     category = db.Column(db.String(80))
-    user = db.relationship("User", back_populates="notification")
+    user = db.relationship("User", secondary=ItemNotification, back_populates="notification")
 
 
 class Product(db.Model):

@@ -4,8 +4,7 @@ import json
 from login import token_required
 from models import Image
 from datetime import datetime
-from app import db, app
-
+from app import db, sendPush
 image = Blueprint('image', __name__)
 
 @image.errorhandler(404)

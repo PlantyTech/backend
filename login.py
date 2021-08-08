@@ -78,6 +78,8 @@ def _login():
 
     if check_password_hash(user.password, auth.get('password')):
         # generates the JWT Token
+        user.notification_token = auth.get('notification_token')
+        user.last_login = datetime.now()
         token = jwt.encode({
             'user_id': user.user_id,
             'exp': datetime.utcnow() + timedelta(minutes=120)
@@ -156,6 +158,8 @@ def _login_with_google():
             .filter_by(email=auth.get('email')) \
             .first()
 
+    user.notification_token = auth.get('notification_token')
+    user.last_login = datetime.now()
     token = jwt.encode({
         'user_id': user.user_id,
         'exp': datetime.utcnow() + timedelta(minutes=120)

@@ -87,7 +87,7 @@ def api_update(current_user):
         return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
     product_id = data.get('product_id')
-    if product_id is not None and not Product.query.get(product_id):
+    if product_id is not None:
         output = {}
 
         if data.get('producer') is not None and len(data.get('producer')) > 0:
