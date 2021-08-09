@@ -17,7 +17,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 # creates SQLALCHEMY object
 db = SQLAlchemy(app)
 
-cred = credentials.Certificate('C:\\Users\\tofen\\Downloads\\plantyai-firebase-adminsdk-v8bx3-89961ffaed.json')
+cred = credentials.Certificate('./plantyai-firebase-adminsdk-v8bx3-89961ffaed.json')
 firebase_admin.initialize_app(cred)
 
 
