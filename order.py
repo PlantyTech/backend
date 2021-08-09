@@ -75,22 +75,22 @@ def api_add(current_user):
         payment_type=payment_type
     )
 
-    # insert user
     db.session.add(order)
     db.session.commit()
+    try:
+        cart = json.loads(data.get("cart"))# database ORM object
+        for product in cart:
+            ordered_product = Ordered_Products(
+                order_id=order.order_id,
+                product_id=product,
+                quantity=cart.get(product),
+            )
 
-    cart=json.loads(data.get("cart"))# database ORM object
-    for product in cart:
-        ordered_product = Ordered_Products(
-            order_id=order.order_id,
-            product_id=product,
-            quantity=cart.get(product),
-        )
-
-        # insert user
-        db.session.add(ordered_product)
+            db.session.add(ordered_product)
+            db.session.commit()
+    except:
+        Order.query.filter_by(order_id=order.order_id).delete()
         db.session.commit()
-
     return make_response('Success following a POST command', 201)
 
 
@@ -222,9 +222,10 @@ def api_order_details_all(current_user):
 
     orderdetails_list = User.query.get(user_id).orderdetails
 
-    output = []
+    output_shipping = []
+    output_billing = []
     for orderdetails in orderdetails_list:
-        output.append({
+        obj={
             'orderdetails_id': orderdetails.orderdetails_id,
             'user_id': orderdetails.user_id,
             'order_type': orderdetails.order_type,
@@ -239,7 +240,11 @@ def api_order_details_all(current_user):
             'block': orderdetails.block,
             'stairs': orderdetails.stairs,
             'apartment': orderdetails.apartment
-        })
+        }
+        if orderdetails.order_type == 0:
+            output_shipping.append(obj)
+        else:
+            output_billing.append(obj)
 
-    return jsonify({'orderdetails': output})
+    return jsonify({'orderdetails': [{"shipping": output_shipping}, {"billing": output_billing}]})
 

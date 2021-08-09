@@ -133,7 +133,7 @@ def api_update(current_user):
     if title is not None:
         notification.title = title
     if read_flag is not None:
-        notification.read_flag = bool(read_flag)
+        notification.read_flag = int(json.loads(read_flag.lower()))
     if category is not None:
         notification.category = category
 
