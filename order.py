@@ -241,7 +241,7 @@ def api_order_details_all(current_user):
             'stairs': orderdetails.stairs,
             'apartment': orderdetails.apartment
         }
-        if orderdetails.order_type == 0:
+        if orderdetails.order_type == "0":
             output_shipping.append(obj)
         else:
             output_billing.append(obj)
