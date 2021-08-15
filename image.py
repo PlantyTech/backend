@@ -23,7 +23,7 @@ def api_all(current_user):
     for image in images:
         link = boto3.client('s3').generate_presigned_url('get_object',
                                                          Params={'Bucket': 'backend-img', 'Key': image.image},
-                                                         ExpiresIn=5)
+                                                         ExpiresIn=120)
         output.append({
             'image_id': image.image_id,
             'user_id': image.user_id,
@@ -122,7 +122,7 @@ def api_get(current_user):
     for image in images:
         link = boto3.client('s3').generate_presigned_url('get_object',
                                                          Params={'Bucket': 'backend-img', 'Key': image.image},
-                                                         ExpiresIn=5)
+                                                         ExpiresIn=120)
         output.append({
             'image_id': image.image_id,
             'user_id': image.user_id,
