@@ -7,6 +7,7 @@ from datetime import datetime
 from app import db, sendPush
 image = Blueprint('image', __name__)
 import boto3
+import os
 
 
 @image.errorhandler(404)
@@ -41,8 +42,8 @@ def api_all(current_user):
 @token_required
 def api_add(current_user):
     try:
-        if request.json is not None:
-            data = request.json
+        if request.form is not None:
+            data = request.form
         elif request.args is not None:
             data = request.args
         else:
@@ -64,7 +65,9 @@ def api_add(current_user):
         category=category
     )
     image.image = image.category+"/"+str(image.image_id)
-    file.save("temp/"+image.image+'.'+file.filename.split('.')[1])
+    filepath=image.image+'.'+file.filename.split('.')[1]
+    file.save("temp/"+filepath)
+    boto3.resource('s3').Bucket('backend-img').upload_file("temp/"+filepath, filepath)
     # insert user
     db.session.add(image)
     db.session.commit()
