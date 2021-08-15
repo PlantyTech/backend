@@ -68,8 +68,8 @@ def api_add(current_user):
     db.session.add(image)
     db.session.commit()
 
-    image.image = image.category+"/"+str(image.image_id)
-    filepath=image.image+'.'+file.filename.split('.')[1]
+    image.image = image.category+"/"+str(image.image_id)+'.'+file.filename.split('.')[1]
+    filepath=image.image
     file.save("temp/"+filepath)
     boto3.resource('s3').Bucket('backend-img').upload_file("temp/"+filepath, filepath)
 
