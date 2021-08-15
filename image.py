@@ -6,10 +6,13 @@ from models import Image
 from datetime import datetime
 from app import db, sendPush
 image = Blueprint('image', __name__)
+import boto3
+
 
 @image.errorhandler(404)
 def page_not_found(e):
     return "<h1>404</h1><p>The resource could not be found.</p>", 404
+
 
 @image.route('/api/image/all', methods=['GET'])
 @token_required
@@ -17,10 +20,13 @@ def api_all(current_user):
     images = Image.query.all()
     output = []
     for image in images:
+        link = boto3.client('s3').generate_presigned_url('get_object',
+                                                         Params={'Bucket': 'backend-img', 'Key': image.image},
+                                                         ExpiresIn=5)
         output.append({
             'image_id': image.image_id,
             'user_id': image.user_id,
-            'image': image.image,
+            'image': link,
             'disease': image.disease,
             'treatment': image.treatment,
             'created_data': image.created_data,
@@ -41,13 +47,12 @@ def api_add(current_user):
             data = request.args
         else:
             data = json.loads(request.data)
+        file = request.files['image']
     except:
         return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
-    user_id, image, category = current_user.user_id, data.get('image'), data.get('category')
-
+    user_id, image, category = current_user.user_id, data.get('category'), data.get('category')
     created_data = datetime.now()
-
     # database ORM object
     image = Image(
         image=image,
@@ -58,6 +63,8 @@ def api_add(current_user):
         updated_data=None,
         category=category
     )
+    image.image = image.category+"/"+str(image.image_id)
+    file.save("temp/"+image.image+'.'+file.filename.split('.')[1])
     # insert user
     db.session.add(image)
     db.session.commit()
@@ -107,10 +114,13 @@ def api_get(current_user):
 
     output = []
     for image in images:
+        link = boto3.client('s3').generate_presigned_url('get_object',
+                                                         Params={'Bucket': 'backend-img', 'Key': image.image},
+                                                         ExpiresIn=5)
         output.append({
             'image_id': image.image_id,
             'user_id': image.user_id,
-            'image': image.image,
+            'image': link,
             'disease': image.disease,
             'treatment': image.treatment,
             'created_data': image.created_data,
