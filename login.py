@@ -78,18 +78,22 @@ def _login():
 
     if check_password_hash(user.password, auth.get('password')):
         # generates the JWT Token
-        user.notification_token = auth.get('notification_token')
+        user.push_token = auth.get('push_token')
         user.last_login = datetime.now()
+        user.os_type = auth.get('os_type')
+
         token = jwt.encode({
             'user_id': user.user_id,
             'exp': datetime.utcnow() + timedelta(minutes=120)
         }, app.config['SECRET_KEY'], algorithm="HS256")
         try:
             return make_response(jsonify({'token': token.decode(),
-                                          'userDetails': {"name": user.name, "email": user.email, "phone": user.phone}}), 201)
+                                          'userDetails': {"name": user.name, "email": user.email, "phone": user.phone,
+                                                          "ta_accept": user.ta_accept}}), 201)
         except:
             return make_response(jsonify({'token': token,
-                                          'userDetails': {"name": user.name, "email": user.email, "phone": user.phone}}), 201)
+                                          'userDetails': {"name": user.name, "email": user.email, "phone": user.phone,
+                                                          "ta_accept": user.ta_accept}}), 201)
 
     # returns 403 if password is wrong
     return make_response(
@@ -97,6 +101,7 @@ def _login():
         403,
         {'WWW-Authenticate': 'Basic realm ="Wrong Password !!"'}
     )
+
 
 # route for loging user in
 @login.route('/api/login-with-google', methods=['GET'])
@@ -158,8 +163,10 @@ def _login_with_google():
             .filter_by(email=auth.get('email')) \
             .first()
 
-    user.notification_token = auth.get('notification_token')
+    user.push_token = auth.get('push_token')
     user.last_login = datetime.now()
+    user.os_type = auth.get('os_type')
+
     token = jwt.encode({
         'user_id': user.user_id,
         'exp': datetime.utcnow() + timedelta(minutes=120)
@@ -167,10 +174,12 @@ def _login_with_google():
 
     try:
         return make_response(jsonify({'token': token.decode(),
-                                      'userDetails': {"name": user.name, "email": user.email, "phone": user.phone}}), 201)
+                                      'userDetails': {"name": user.name, "email": user.email, "phone": user.phone,
+                                                      "ta_accept": user.ta_accept}}), 201)
     except:
         return make_response(jsonify({'token': token,
-                                      'userDetails': {"name": user.name, "email": user.email, "phone": user.phone}}), 201)
+                                      'userDetails': {"name": user.name, "email": user.email, "phone": user.phone,
+                                                      "ta_accept": user.ta_accept}}), 201)
 
 
 

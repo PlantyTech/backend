@@ -1,11 +1,12 @@
 from app import app, db
 from login import login, token_required
 from models import User, Image
-from flask import request, jsonify
+from flask import request, jsonify, make_response
 from image import image
 from product import product
 from order import order
 from notification import notification
+import json
 
 app.register_blueprint(login)
 app.register_blueprint(image)
@@ -25,6 +26,21 @@ def dict_factory(cursor, row):
 def home():
     return '''<h1>nothing here</h1>
 <p>Planty.</p>'''
+
+
+@login.route('/api/ta_accept', methods=['POST'])
+@token_required
+def _ta_accept(current_user):
+    try:
+        if request.json is not None:
+            data = request.json
+        elif request.args is not None:
+            data = request.args
+        else:
+            data = json.loads(request.data)
+    except:
+        return make_response('Request had bad syntax or was impossible to fulfill', 400)
+    current_user.ta_accept = int(json.loads(data.get('ta_accept').lower()))
 
 
 # User Database Route
