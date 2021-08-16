@@ -40,7 +40,11 @@ def ta_accept(current_user):
             data = json.loads(request.data)
     except:
         return make_response('Request had bad syntax or was impossible to fulfill', 400)
-    current_user.ta_accept = int(json.loads(data.get('ta_accept').lower()))
+
+    user = Image.query.get(current_user.user_id)
+    user.ta_accept = int(json.loads(data.get('ta_accept').lower()))
+    db.session.commit()
+
     return "succes"
 
 # User Database Route
