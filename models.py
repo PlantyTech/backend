@@ -17,7 +17,7 @@ class User(db.Model):
     location = db.Column(db.String(100))
     push_token = db.Column(db.String(200))
     last_login = db.Column(db.DateTime)
-    ta_accept = db.Column(db.Boolean, nullable=False)
+    ta_accept = db.Column(db.Boolean, default=False)
     os_type = db.Column(db.String(200))
     image = db.relationship("Image", back_populates="user")
     notification = db.relationship("Notification", secondary=ItemNotification, back_populates="user")
