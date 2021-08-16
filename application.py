@@ -41,7 +41,7 @@ def ta_accept(current_user):
     except:
         return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
-    user = Image.query.get(current_user.user_id)
+    user = User.query.get(current_user.user_id)
     user.ta_accept = int(json.loads(data.get('ta_accept').lower()))
     db.session.commit()
 
