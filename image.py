@@ -68,7 +68,7 @@ def api_add(current_user):
     db.session.add(image)
     db.session.commit()
 
-    dir = os.path.join("C:\\", "temp", image.category)
+    dir = os.path.join("temp", image.category)
     if not os.path.exists(dir):
         os.mkdir(dir)
 

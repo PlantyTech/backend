@@ -28,9 +28,9 @@ def home():
 <p>Planty.</p>'''
 
 
-@login.route('/api/ta_accept', methods=['POST'])
+@app.route('/api/ta/update', methods=['POST'])
 @token_required
-def _ta_accept(current_user):
+def ta_accept(current_user):
     try:
         if request.json is not None:
             data = request.json
@@ -41,7 +41,7 @@ def _ta_accept(current_user):
     except:
         return make_response('Request had bad syntax or was impossible to fulfill', 400)
     current_user.ta_accept = int(json.loads(data.get('ta_accept').lower()))
-
+    return "succes"
 
 # User Database Route
 # this route sends back list of users users
