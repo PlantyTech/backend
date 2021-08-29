@@ -2,7 +2,7 @@ from flask import Blueprint, make_response
 from flask import request, jsonify
 import json
 from login import token_required
-from models import Image, Notification
+from models import Image, Notification, User
 from datetime import datetime
 from app import db, sendPush
 image = Blueprint('image', __name__)
@@ -113,7 +113,7 @@ def api_update(current_user):
     image.disease = disease
     image.treatment = treatment
     image.updated_data = updated_data
-
+    image_user = User.query.get(image.user_id)
     notification = Notification(
         title="Noutati despre o imagine adaugata",
         text="Avem noutati despre poza din categoria " + image.category +
@@ -121,13 +121,13 @@ def api_update(current_user):
         data=updated_data,
         read_flag=False,
         category=image.category,
-        user=image.user
+        user=[image_user]
     )
     # insert notification
     db.session.add(notification)
     db.session.commit()
 
-    registration_token = [user_it.push_token for user_it in image.user]
+    registration_token = [image_user.push_token]
     sendPush(title=notification.title, msg=notification.text, registration_token=registration_token)
 
     return "success"
