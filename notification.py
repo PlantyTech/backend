@@ -67,7 +67,7 @@ def api_add(*_):
     db.session.add(notification)
     db.session.commit()
 
-    registration_token = [user_it.push_token for user_it in user]
+    registration_token = [user_it.push_token for user_it in user if user_it.push_token]
     sendPush(title=notification.title, msg=notification.text, registration_token=registration_token)
 
     return "success"
@@ -107,7 +107,7 @@ def api_addall(*_):
     db.session.add(notification)
     db.session.commit()
 
-    registration_token = [user_it.push_token for user_it in user]
+    registration_token = [user_it.push_token for user_it in user if user_it.push_token]
     sendPush(title=notification.title, msg=notification.text, registration_token=registration_token)
 
     return "success"
@@ -139,7 +139,7 @@ def api_update(*_):
     if title is not None:
         notification.title = title
     if read_flag is not None:
-        notification.read_flag = int(json.loads(read_flag.lower()))
+        notification.read_flag = int(json.loads(str(read_flag).lower()))
     if category is not None:
         notification.category = category
 

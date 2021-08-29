@@ -141,7 +141,7 @@ def api_update(current_user):
         if data.get('stock') is not None and len(data.get('stock')) > 0:
             product.stock = data.get('stock')
         if data.get('stock_flag') is not None and len(data.get('stock_flag')) > 0:
-            product.stock_flag = int(json.loads(data.get('stock_flag').lower()))
+            product.stock_flag = int(json.loads(str(data.get('stock_flag')).lower()))
 
         db.session.commit()
 

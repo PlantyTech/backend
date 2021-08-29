@@ -117,7 +117,7 @@ def api_update(current_user):
     notification = Notification(
         title="Noutati despre o imagine adaugata",
         text="Avem noutati despre poza din categoria " + image.category +
-             " din data " + image.created_data + ". Intra sa verifici in aplicatie",
+             " din data " + image.created_data.strftime("%d/%m/%Y, %H:%M") + ". Intra sa verifici in aplicatie",
         data=updated_data,
         read_flag=False,
         category=image.category,

@@ -42,7 +42,7 @@ def ta_accept(current_user):
         return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
     user = User.query.get(current_user.user_id)
-    user.ta_accept = int(json.loads(data.get('ta_accept').lower()))
+    user.ta_accept = int(json.loads(str(data.get('ta_accept')).lower()))
     db.session.commit()
 
     return "succes"
