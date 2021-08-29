@@ -4,6 +4,7 @@ import sqlite3
 from flask_sqlalchemy import SQLAlchemy
 import firebase_admin
 from firebase_admin import credentials, messaging
+from flask_cors import CORS
 
 # creates Flask object
 app = Flask(__name__)
@@ -16,6 +17,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 # creates SQLALCHEMY object
 db = SQLAlchemy(app)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:4200/*"}})
 
 cred = credentials.Certificate('./plantyai-firebase-adminsdk-v8bx3-89961ffaed.json')
 firebase_admin.initialize_app(cred)
