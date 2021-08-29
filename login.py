@@ -81,7 +81,8 @@ def _login():
         user.push_token = auth.get('push_token')
         user.last_login = datetime.now()
         user.os_type = auth.get('os_type')
-
+        print(user.push_token)
+        db.session.commit()
         token = jwt.encode({
             'user_id': user.user_id,
             'exp': datetime.utcnow() + timedelta(minutes=120)

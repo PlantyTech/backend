@@ -8,6 +8,7 @@ from app import db, sendPush
 image = Blueprint('image', __name__)
 import boto3
 import os
+from firebase_admin import messaging
 
 
 @image.errorhandler(404)
@@ -107,7 +108,18 @@ def api_update(current_user):
     image.updated_data = updated_data
 
     db.session.commit()
-
+    registration_token = current_user.push_token
+    print(registration_token)
+    message = messaging.MulticastMessage(
+        notification=messaging.Notification(
+            title="ana are mere",
+            body="mos craciun cu plete dalbe"
+        ),
+        data=None,
+        tokens=[registration_token],
+    )
+    response = messaging.send_multicast(message)
+    print(response)
     return "success"
 
 
