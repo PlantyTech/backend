@@ -47,6 +47,7 @@ def ta_accept(current_user):
 
     return "succes"
 
+
 # User Database Route
 # this route sends back list of users users
 @app.route('/api/users', methods=['GET'])
@@ -69,6 +70,20 @@ def get_all_users(current_user):
         })
 
     return jsonify({'users': output})
+
+
+@order.route('/api/user/delete', methods=['DELETE'])
+@token_required
+def api_delete(current_user):
+
+    user_id = current_user.user_id
+
+    User.query.filter_by(user_id=user_id).delete()
+
+    db.session.commit()
+
+    return "success"
+
 
 @app.errorhandler(404)
 def page_not_found(e):

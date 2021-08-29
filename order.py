@@ -124,7 +124,7 @@ def api_update(current_user):
 
 @order.route('/api/ordered_products/all', methods=['GET'])
 @token_required
-def api_ordered_update(current_user):
+def api_ordered_all(current_user):
     try:
         if request.json is not None:
             data = request.json
@@ -248,3 +248,82 @@ def api_order_details_all(current_user):
 
     return jsonify({'orderdetails': [{"shipping": output_shipping}, {"billing": output_billing}]})
 
+
+@order.route('/api/order/shipping-details/update', methods=['POST'])
+@token_required
+def api_shiping_update(current_user):
+    try:
+        if request.json is not None:
+            data = request.json
+        elif request.args is not None:
+            data = request.args
+        else:
+            data = json.loads(request.data)
+    except:
+        return make_response('Request had bad syntax or was impossible to fulfill', 400)
+
+    orderdetails_id = data.get('orderdetails.orderdetails_id')
+    email = data.get('orderdetails.email')
+    first_name = data.get('orderdetails.first_name')
+    second_name = data.get('orderdetails.second_name')
+    phone = data.get('orderdetails.phone')
+    county = data.get('orderdetails.county')
+    city = data.get('orderdetails.city')
+    street = data.get('orderdetails.street')
+    number = data.get('orderdetails.number')
+    block = data.get('orderdetails.block')
+    stairs = data.get('orderdetails.stairs')
+    apartment = data.get('orderdetails.apartment')
+
+    orderdetails=Orderdetails.query.get(orderdetails_id)
+
+    if email is not None:
+        orderdetails.email = email
+    if first_name is not None:
+        orderdetails.first_name = first_name
+    if second_name is not None:
+        orderdetails.second_name = second_name
+    if phone is not None:
+        orderdetails.phone = phone
+    if county is not None:
+        orderdetails.county = county
+    if city is not None:
+        orderdetails.city = city
+    if street is not None:
+        orderdetails.street = street
+    if street is not None:
+        orderdetails.street = street
+    if number is not None:
+        orderdetails.number = number
+    if block is not None:
+        orderdetails.block = block
+    if stairs is not None:
+        orderdetails.stairs = stairs
+    if apartment is not None:
+        orderdetails.apartment = apartment
+
+    db.session.commit()
+
+    return "success"
+
+
+@order.route('/api/order/shipping-details/delete', methods=['DELETE'])
+@token_required
+def api_delete(*_):
+    try:
+        if request.json is not None:
+            data = request.json
+        elif request.args is not None:
+            data = request.args
+        else:
+            data = json.loads(request.data)
+    except:
+        return make_response('Request had bad syntax or was impossible to fulfill', 400)
+
+    orderdetails_id = data.get('orderdetails_id')
+
+    Orderdetails.query.filter_by(orderdetails_id=orderdetails_id).delete()
+
+    db.session.commit()
+
+    return "success"

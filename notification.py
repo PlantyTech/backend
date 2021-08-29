@@ -16,7 +16,7 @@ def page_not_found(e):
 
 @notification.route('/api/notification/all', methods=['GET'])
 @token_required
-def api_all(current_user):
+def api_all(*_):
     notifications = Notification.query.all()
     output = []
     for notification in notifications:
@@ -35,7 +35,7 @@ def api_all(current_user):
 
 @notification.route('/api/notification/add', methods=['POST'])
 @token_required
-def api_add(current_user):
+def api_add(*_):
     try:
         if request.json is not None:
             data = request.json
@@ -67,12 +67,15 @@ def api_add(current_user):
     db.session.add(notification)
     db.session.commit()
 
+    registration_token = [user_it.push_token for user_it in user]
+    sendPush(title=notification.title, msg=notification.text, registration_token=registration_token)
+
     return "success"
 
 
 @notification.route('/api/notification/addall', methods=['POST'])
 @token_required
-def api_addall(current_user):
+def api_addall(*_):
     try:
         if request.json is not None:
             data = request.json
@@ -104,12 +107,15 @@ def api_addall(current_user):
     db.session.add(notification)
     db.session.commit()
 
+    registration_token = [user_it.push_token for user_it in user]
+    sendPush(title=notification.title, msg=notification.text, registration_token=registration_token)
+
     return "success"
 
 
 @notification.route('/api/notification/update', methods=['POST'])
 @token_required
-def api_update(current_user):
+def api_update(*_):
     try:
         if request.json is not None:
             data = request.json
@@ -126,7 +132,7 @@ def api_update(current_user):
     read_flag = data.get('read_flag')
     category = data.get('category')
 
-    notification=Notification.query.get(notification_id)
+    notification = Notification.query.get(notification_id)
 
     if text is not None:
         notification.text = text
@@ -144,7 +150,7 @@ def api_update(current_user):
 
 @notification.route('/api/notification/delete', methods=['DELETE'])
 @token_required
-def api_delete(current_user):
+def api_delete(*_):
     try:
         if request.json is not None:
             data = request.json

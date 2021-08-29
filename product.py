@@ -34,6 +34,42 @@ def api_all(current_user):
     return jsonify({'product': output})
 
 
+@product.route('/api/product/search', methods=['GET'])
+@token_required
+def api_search(current_user):
+    try:
+        if request.json is not None:
+            data = request.json
+        elif request.args is not None:
+            data = request.args
+        else:
+            data = json.loads(request.data)
+    except:
+        return make_response('Request had bad syntax or was impossible to fulfill', 400)
+
+    products = Product.query.all()
+    output = []
+    search = data.get("search")
+    for product in products:
+        if product.stock_flag:
+            if (search in product.producer or
+                    search in product.name or
+                    search in product.description or
+                    search is None):
+                output.append({
+                    'product_id': product.product_id,
+                    'producer': product.producer,
+                    'name': product.name,
+                    'image': product.image,
+                    'description': product.description,
+                    'price': product.price,
+                    'provider': product.provider,
+                    'stock': product.stock
+                })
+
+    return jsonify({'product': output})
+
+
 @product.route('/api/product/add', methods=['POST'])
 @token_required
 def api_add(current_user):

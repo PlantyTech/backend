@@ -81,7 +81,7 @@ def _login():
         user.push_token = auth.get('push_token')
         user.last_login = datetime.now()
         user.os_type = auth.get('os_type')
-        print(user.push_token)
+        user.language = auth.get('language')
         db.session.commit()
         token = jwt.encode({
             'user_id': user.user_id,
@@ -167,6 +167,7 @@ def _login_with_google():
     user.push_token = auth.get('push_token')
     user.last_login = datetime.now()
     user.os_type = auth.get('os_type')
+    user.language = auth.get('language')
 
     token = jwt.encode({
         'user_id': user.user_id,

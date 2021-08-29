@@ -2,13 +2,12 @@ from flask import Blueprint, make_response
 from flask import request, jsonify
 import json
 from login import token_required
-from models import Image
+from models import Image, Notification
 from datetime import datetime
 from app import db, sendPush
 image = Blueprint('image', __name__)
 import boto3
 import os
-from firebase_admin import messaging
 
 
 @image.errorhandler(404)
@@ -29,6 +28,7 @@ def api_all(current_user):
             'image_id': image.image_id,
             'user_id': image.user_id,
             'image': link,
+            'orientation': image.orientation,
             'disease': image.disease,
             'treatment': image.treatment,
             'created_data': image.created_data,
@@ -53,11 +53,15 @@ def api_add(current_user):
     except:
         return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
-    user_id, image, category = current_user.user_id, data.get('category'), data.get('category')
+    user_id = current_user.user_id
+    image = data.get('category')
+    category = data.get('category')
+    orientation = data.get('category')
     created_data = datetime.now()
     # database ORM object
     image = Image(
         image=image,
+        orientation=orientation,
         user_id=user_id,
         disease=None,
         treatment=None,
@@ -98,28 +102,33 @@ def api_update(current_user):
     except:
         return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
-    image_id, disease, treatment = data.get('image_id'), data.get('disease'), data.get('treatment')
+    image_id = data.get('image_id')
+    disease = data.get('disease')
+    treatment = data.get('treatment')
 
     updated_data = datetime.now()
 
-    image=Image.query.get(image_id)
+    image = Image.query.get(image_id)
     image.disease = disease
     image.treatment = treatment
     image.updated_data = updated_data
 
-    db.session.commit()
-    registration_token = current_user.push_token
-    print(registration_token)
-    message = messaging.MulticastMessage(
-        notification=messaging.Notification(
-            title="ana are mere",
-            body="mos craciun cu plete dalbe"
-        ),
-        data=None,
-        tokens=[registration_token],
+    notification = Notification(
+        title="Noutati despre o imagine adaugata",
+        text="Avem noutati despre poza din categoria " + image.category +
+             " din data " + image.created_data + ". Intra sa verifici in aplicatie",
+        data=updated_data,
+        read_flag=False,
+        category=image.category,
+        user=image.user
     )
-    response = messaging.send_multicast(message)
-    print(response)
+    # insert notification
+    db.session.add(notification)
+    db.session.commit()
+
+    registration_token = [user_it.push_token for user_it in image.user]
+    sendPush(title=notification.title, msg=notification.text, registration_token=registration_token)
+
     return "success"
 
 
@@ -145,6 +154,7 @@ def api_get(current_user):
             'image_id': image.image_id,
             'user_id': image.user_id,
             'image': link,
+            'orientation': image.orientation,
             'disease': image.disease,
             'treatment': image.treatment,
             'created_data': image.created_data,
