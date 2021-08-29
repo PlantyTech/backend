@@ -80,7 +80,8 @@ def api_add(current_user):
     image.image = image.category+"/"+str(image.image_id)+'.'+file.filename.split('.')[1]
     filepath=image.image
     file.save("temp/"+filepath)
-    boto3.resource('s3').Bucket('backend-img').upload_file("temp/"+filepath, filepath)
+    boto3.resource('s3').Bucket('backend-img').upload_file("temp/"+filepath, filepath,
+                                                           ExtraArgs={"ContentType": 'image/jpeg'})
 
     db.session.commit()
 
