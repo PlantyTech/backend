@@ -56,7 +56,7 @@ def api_add(current_user):
     user_id = current_user.user_id
     image = data.get('category')
     category = data.get('category')
-    orientation = data.get('category')
+    orientation = data.get('orientation')
     created_data = datetime.now()
     # database ORM object
     image = Image(
