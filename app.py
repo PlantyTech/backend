@@ -40,4 +40,5 @@ def sendPush(title, msg, registration_token):
         # Response is a message ID string.
         print('Successfully sent message:', response)
     except:
-        print('error: '+registration_token)
+        print('error: ')
+        print(registration_token)

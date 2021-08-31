@@ -127,7 +127,7 @@ def api_update(current_user):
     db.session.add(notification)
     db.session.commit()
 
-    registration_token = [image_user.push_token]
+    registration_token = [user_it.push_token for user_it in image_user if user_it.push_token]
     sendPush(title=notification.title, msg=notification.text, registration_token=registration_token)
 
     return "success"
