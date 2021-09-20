@@ -113,6 +113,7 @@ def api_update(current_user):
     image.disease = disease
     image.treatment = treatment
     image.updated_data = updated_data
+
     image_user = User.query.get(image.user_id)
     notification = Notification(
         title="Noutati despre o imagine adaugata",
@@ -127,7 +128,7 @@ def api_update(current_user):
     db.session.add(notification)
     db.session.commit()
 
-    registration_token = [user_it.push_token for user_it in image_user if user_it.push_token]
+    registration_token = [user_it.push_token for user_it in [image_user] if user_it.push_token]
     sendPush(title=notification.title, msg=notification.text, registration_token=registration_token)
 
     return "success"
