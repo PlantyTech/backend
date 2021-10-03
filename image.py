@@ -22,7 +22,7 @@ def api_all(current_user):
     output = []
     for image in images:
         link = boto3.client('s3').generate_presigned_url('get_object',
-                                                         Params={'Bucket': 'backend-img', 'Key': image.image},
+                                                         Params={'Bucket': 'plantyai-api', 'Key': image.image},
                                                          ExpiresIn=120)
         output.append({
             'image_id': image.image_id,
@@ -80,7 +80,7 @@ def api_add(current_user):
     image.image = image.category+"/"+str(image.image_id)+'.'+file.filename.split('.')[1]
     filepath=image.image
     file.save("temp/"+filepath)
-    boto3.resource('s3').Bucket('backend-img').upload_file("temp/"+filepath, filepath,
+    boto3.resource('s3').Bucket('plantyai-api').upload_file("temp/"+filepath, filepath,
                                                            ExtraArgs={"ContentType": 'image/jpeg'})
 
     db.session.commit()
@@ -150,7 +150,7 @@ def api_get(current_user):
     output = []
     for image in images:
         link = boto3.client('s3').generate_presigned_url('get_object',
-                                                         Params={'Bucket': 'backend-img', 'Key': image.image},
+                                                         Params={'Bucket': 'plantyai-api', 'Key': image.image},
                                                          ExpiresIn=120)
         output.append({
             'image_id': image.image_id,
