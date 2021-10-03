@@ -18,7 +18,7 @@ class User(db.Model):
     password = db.Column(StringEncryptedType(db.String(80), key))
     phone = db.Column(StringEncryptedType(db.String(50), key))
     location = db.Column(StringEncryptedType(db.String(100), key))
-    push_token = db.Column(StringEncryptedType(db.String(200), key))
+    push_token = db.Column(StringEncryptedType(db.String, key))
     last_login = db.Column(StringEncryptedType(db.DateTime, key))
     ta_accept = db.Column(StringEncryptedType(db.Boolean, key), default=False)
     os_type = db.Column(StringEncryptedType(db.String(200), key))
