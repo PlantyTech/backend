@@ -19,7 +19,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:4200/*"}})
 
-cred = credentials.Certificate('./plantyai-firebase-adminsdk-v8bx3-89961ffaed.json')
+cred = credentials.Certificate('./plantyai-firebase-adminsdk-v8bx3-b11e46feef.json')
 firebase_admin.initialize_app(cred)
 
 
@@ -33,7 +33,6 @@ def sendPush(title, msg, registration_token):
             ),
             tokens=registration_token,
         )
-
         # Send a message to the device corresponding to the provided
         # registration token.
         response = messaging.send_multicast(message)

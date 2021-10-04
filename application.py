@@ -72,7 +72,7 @@ def get_all_users(current_user):
     return jsonify({'users': output})
 
 
-@order.route('/api/user/delete', methods=['DELETE'])
+@app.route('/api/user/delete', methods=['DELETE'])
 @token_required
 def api_delete(current_user):
 

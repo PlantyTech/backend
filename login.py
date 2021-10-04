@@ -169,6 +169,7 @@ def _login_with_google():
     user.os_type = auth.get('os_type')
     user.language = auth.get('language')
 
+    db.session.commit()
     token = jwt.encode({
         'user_id': user.user_id,
         'exp': datetime.utcnow() + timedelta(minutes=120)
