@@ -33,13 +33,16 @@ class Image(db.Model):
     __tablename__ = 'image'
     image_id = db.Column(db.String, default=lambda: uuid.uuid4().hex, primary_key=True)
     user_id = db.Column(db.String, db.ForeignKey('user.user_id'), nullable=False)
-    image = db.Column(StringEncryptedType(db.String, key), nullable=False)
-    orientation = db.Column(StringEncryptedType(db.String, key), nullable=False)
+    image = db.Column(StringEncryptedType(db.Array(db.String), key), nullable=False)
+    orientation = db.Column(StringEncryptedType(db.Array(db.String), key), nullable=False)
     disease = db.Column(StringEncryptedType(db.String(80), key))
     treatment = db.Column(StringEncryptedType(db.String(100), key))
     created_data = db.Column(StringEncryptedType(db.DateTime, key))
     updated_data = db.Column(StringEncryptedType(db.DateTime, key))
     category = db.Column(StringEncryptedType(db.String(80), key), nullable=False)
+    lat = db.Column(StringEncryptedType(db.Float(), key))
+    long = db.Column(StringEncryptedType(db.Float(), key))
+    questions = db.Column(StringEncryptedType(db.Array(db.Json()), key))
     user = db.relationship("User", back_populates="image")
 
 

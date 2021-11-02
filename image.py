@@ -21,9 +21,11 @@ def api_all(current_user):
     images = Image.query.all()
     output = []
     for image in images:
-        link = boto3.client('s3').generate_presigned_url('get_object',
-                                                         Params={'Bucket': 'plantyai-api', 'Key': image.image},
-                                                         ExpiresIn=120)
+        link = [boto3.client('s3').generate_presigned_url('get_object',
+                                                          Params={'Bucket': 'plantyai-api', 'Key': image_i},
+                                                          ExpiresIn=120)
+                for image_i in image.image]
+
         output.append({
             'image_id': image.image_id,
             'user_id': image.user_id,
@@ -33,7 +35,10 @@ def api_all(current_user):
             'treatment': image.treatment,
             'created_data': image.created_data,
             'updated_data': image.updated_data,
-            'category': image.category
+            'lat': image.lat,
+            'long': image.long,
+            'category': image.category,
+            'questions': image.questions
         })
 
     return jsonify({'images': output})
@@ -49,14 +54,14 @@ def api_add(current_user):
             data = request.args
         else:
             data = json.loads(request.data)
-        file = request.files['image']
+        file = request.files.getlist('image[]')  # to check if this is ok
     except:
         return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
     user_id = current_user.user_id
     image = data.get('category')
     category = data.get('category')
-    orientation = data.get('orientation')
+    orientation = data.get('orientation')  # to check if is array or is string
     created_data = datetime.now()
     # database ORM object
     image = Image(
@@ -77,15 +82,16 @@ def api_add(current_user):
     if not os.path.exists(dir):
         os.mkdir(dir)
 
-    image.image = image.category+"/"+str(image.image_id)+'.'+file.filename.split('.')[1]
-    filepath=image.image
-    file.save("temp/"+filepath)
-    boto3.resource('s3').Bucket('plantyai-api').upload_file("temp/"+filepath, filepath,
-                                                           ExtraArgs={"ContentType": 'image/jpeg'})
+    image.image = [image.category+"/"+str(image.image_id)+'.'+file_i.filename.split('.')[1] for file_i in file]
+    for i, image_i in enumerate(image.image):
+        filepath=image_i
+        file[i].save("temp/"+filepath)
+        boto3.resource('s3').Bucket('plantyai-api').upload_file("temp/"+filepath, filepath,
+                                                                ExtraArgs={"ContentType": 'image/jpeg'})
+        os.remove("temp/"+filepath)
 
     db.session.commit()
 
-    os.remove("temp/"+filepath)
 
     return "success"
 
@@ -148,9 +154,11 @@ def api_get(current_user):
 
     output = []
     for image in images:
-        link = boto3.client('s3').generate_presigned_url('get_object',
-                                                         Params={'Bucket': 'plantyai-api', 'Key': image.image},
-                                                         ExpiresIn=120)
+        link = [boto3.client('s3').generate_presigned_url('get_object',
+                                                          Params={'Bucket': 'plantyai-api', 'Key': image_i},
+                                                          ExpiresIn=120)
+                for image_i in image.image]
+
         output.append({
             'image_id': image.image_id,
             'user_id': image.user_id,
@@ -160,7 +168,10 @@ def api_get(current_user):
             'treatment': image.treatment,
             'created_data': image.created_data,
             'updated_data': image.updated_data,
-            'category': image.category
+            'lat': image.lat,
+            'long': image.long,
+            'category': image.category,
+            'questions': image.questions
         })
 
     return jsonify({'images': output})
