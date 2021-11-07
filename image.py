@@ -2,7 +2,7 @@ from flask import Blueprint, make_response
 from flask import request, jsonify
 import json
 from login import token_required
-from models import Image, Notification, User
+from models import Image, Notification, User, Question
 from datetime import datetime
 from app import db, sendPush
 image = Blueprint('image', __name__)
@@ -20,17 +20,26 @@ def page_not_found(e):
 def api_all(current_user):
     images = Image.query.all()
     output = []
+    questions = []
     for image in images:
-        link = [boto3.client('s3').generate_presigned_url('get_object',
-                                                          Params={'Bucket': 'plantyai-api', 'Key': image_i},
+        link1 = boto3.client('s3').generate_presigned_url('get_object',
+                                                          Params={'Bucket': 'plantyai-api', 'Key': image.image1},
                                                           ExpiresIn=120)
-                for image_i in image.image["image"]]
-
+        link2 = boto3.client('s3').generate_presigned_url('get_object',
+                                                          Params={'Bucket': 'plantyai-api', 'Key': image.image2},
+                                                          ExpiresIn=120)
+        for question in image.questions:
+            questions.append({
+                'question': question.question,
+                'answer': question.answer
+            })
         output.append({
             'image_id': image.image_id,
             'user_id': image.user_id,
-            'image': link,
-            'orientation': image.orientation,
+            'image1': link1,
+            'image2': link2,
+            'orientation1': image.orientation1,
+            'orientation2': image.orientation2,
             'disease': image.disease,
             'treatment': image.treatment,
             'created_data': image.created_data,
@@ -38,7 +47,7 @@ def api_all(current_user):
             'lat': image.lat,
             'long': image.long,
             'category': image.category,
-            'questions': image.questions
+            'questions': questions
         })
 
     return jsonify({'images': output})
@@ -55,23 +64,24 @@ def api_add(current_user):
             data = request.args
         else:
             data = json.loads(request.data)
-        file = [request.files["image"+str(i)] for i in range(int(data.get('image_number')))]  # to check if this is ok
+        file1 = request.files["image1"]
+        file2 = request.files["image2"]
     except:
         return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
     user_id = current_user.user_id
-    image = {}
     category = data.get('category')
-    orientation = {"orientation": [data.get('orientation'+str(i)) for i in range(int(data.get('image_number')))]}
+    orientation1 = data.get('orientation1')
+    orientation2 = data.get('orientation2')
     created_data = datetime.now()
     lat = data.get('lat')
     long = data.get('long')
-    # jsonify
-    questions = {data.get('questions'+str(i)): data.get('answers'+str(i)) for i in range(int(data.get('questions_number')))}
     # database ORM object
     image = Image(
-        image=image,
-        orientation=orientation,
+        image1=None,
+        image2=None,
+        orientation1=orientation1,
+        orientation2=orientation2,
         user_id=user_id,
         disease=None,
         treatment=None,
@@ -79,29 +89,37 @@ def api_add(current_user):
         updated_data=None,
         lat=lat,
         long=long,
-        questions=jsonify(questions),
+        questions=None,
         category=category
     )
     # insert user
     db.session.add(image)
     db.session.commit()
 
+    for i in range(int(data.get('questions_number'))):
+        question = Question(
+            image_id=image.image_id,
+            question=data.get('question'+str(i)),
+            answer=data.get('answer'+str(i))
+        )
+        db.session.add(question)
+
     dir = os.path.join("temp", image.category)
     if not os.path.exists(dir):
         os.mkdir(dir)
 
-    image.image = {"image": [image.category+"/"+str(image.image_id)+'.'+file_i.filename.split('.')[1] for file_i in file]}
-    for i, image_i in enumerate(image.image["image"]):
-        filepath=image_i
-        file[i].save("temp/"+filepath)
-        boto3.resource('s3').Bucket('plantyai-api').upload_file("temp/"+filepath, filepath,
-                                                                ExtraArgs={"ContentType": 'image/jpeg'})
-        os.remove("temp/"+filepath)
+    image.image1 = image.category+"/"+str(image.image_id)+'.'+file1.filename.split('.')[1]
+    image.image2 = image.category+"/"+str(image.image_id)+'.'+file1.filename.split('.')[1]
+    file1.save("temp/"+image.image1)
+    file1.save("temp/"+image.image2)
+    boto3.resource('s3').Bucket('plantyai-api').upload_file("temp/"+image.image1, image.image1,
+                                                            ExtraArgs={"ContentType": 'image/jpeg'})
+    boto3.resource('s3').Bucket('plantyai-api').upload_file("temp/"+image.image2, image.image2,
+                                                            ExtraArgs={"ContentType": 'image/jpeg'})
+    os.remove("temp/"+image.image1)
+    os.remove("temp/"+image.image2)
 
     db.session.commit()
-    print(image.image)
-    print(image.orientation)
-    print(image.questions)
     return "success"
 
 
@@ -162,17 +180,26 @@ def api_get(current_user):
     images = current_user.image
 
     output = []
+    questions = []
     for image in images:
-        link = [boto3.client('s3').generate_presigned_url('get_object',
-                                                          Params={'Bucket': 'plantyai-api', 'Key': image_i},
+        link1 = boto3.client('s3').generate_presigned_url('get_object',
+                                                          Params={'Bucket': 'plantyai-api', 'Key': image.image1},
                                                           ExpiresIn=120)
-                for image_i in image.image["image"]]
-
+        link2 = boto3.client('s3').generate_presigned_url('get_object',
+                                                          Params={'Bucket': 'plantyai-api', 'Key': image.image2},
+                                                          ExpiresIn=120)
+        for question in image.questions:
+            questions.append({
+                'question': question.question,
+                'answer': question.answer
+            })
         output.append({
             'image_id': image.image_id,
             'user_id': image.user_id,
-            'image': link,
-            'orientation': image.orientation,
+            'image1': link1,
+            'image2': link2,
+            'orientation1': image.orientation1,
+            'orientation2': image.orientation2,
             'disease': image.disease,
             'treatment': image.treatment,
             'created_data': image.created_data,
@@ -180,7 +207,7 @@ def api_get(current_user):
             'lat': image.lat,
             'long': image.long,
             'category': image.category,
-            'questions': image.questions
+            'questions': questions
         })
 
     return jsonify({'images': output})
