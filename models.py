@@ -44,7 +44,7 @@ class Image(db.Model):
     category = db.Column(StringEncryptedType(db.String(80), key), nullable=False)
     lat = db.Column(StringEncryptedType(db.Float(), key))
     long = db.Column(StringEncryptedType(db.Float(), key))
-    questions = db.relationship("Question", back_populates="image")
+    question = db.relationship("Question", back_populates="image")
     user = db.relationship("User", back_populates="image")
 
 
