@@ -50,24 +50,24 @@ def api_add(current_user):
     try:
         if request.form is not None:
             data = request.form
+            print(data)
         elif request.args is not None:
             data = request.args
         else:
             data = json.loads(request.data)
-
-        file = [request.files['image'+str(i)] for i in range(data.get('image_number'))]  # to check if this is ok
-    except:
+        file = [request.files["image"+str(i)] for i in range(int(data.get('image_number')))]  # to check if this is ok
+    except Exception as e:
         return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
     user_id = current_user.user_id
     image = []
     category = data.get('category')
-    orientation = [data.get('orientation'+str(i)) for i in range(data.get('image_number'))]
+    orientation = [data.get('orientation'+str(i)) for i in range(int(data.get('image_number')))]
     created_data = datetime.now()
     lat = data.get('lat')
     long = data.get('long')
     # jsonify
-    questions = {data.get('questions'+str(i)): data.get('answer'+str(i)) for i in range(data.get('questions_number'))}
+    questions = {data.get('questions'+str(i)): data.get('answers'+str(i)) for i in range(int(data.get('questions_number')))}
     # database ORM object
     image = Image(
         image=image,
@@ -99,7 +99,9 @@ def api_add(current_user):
         os.remove("temp/"+filepath)
 
     db.session.commit()
-
+    print(image.image)
+    print(image.orientation)
+    print(image.questions)
     return "success"
 
 
