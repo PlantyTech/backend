@@ -28,7 +28,7 @@ def api_all(current_user):
         link2 = boto3.client('s3').generate_presigned_url('get_object',
                                                           Params={'Bucket': 'plantyai-api', 'Key': image.image2},
                                                           ExpiresIn=120)
-        for question in image.questions:
+        for question in image.question:
             questions.append({
                 'question': question.question,
                 'answer': question.answer
@@ -59,20 +59,19 @@ def api_add(current_user):
     try:
         if request.form is not None:
             data = request.form
-            print(data)
         elif request.args is not None:
             data = request.args
         else:
             data = json.loads(request.data)
-        file1 = request.files["image1"]
-        file2 = request.files["image2"]
+        file1 = request.files["image0"]
+        file2 = request.files["image1"]
     except:
         return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
     user_id = current_user.user_id
     category = data.get('category')
-    orientation1 = data.get('orientation1')
-    orientation2 = data.get('orientation2')
+    orientation1 = data.get('orientation0')
+    orientation2 = data.get('orientation1')
     created_data = datetime.now()
     lat = data.get('lat')
     long = data.get('long')
@@ -89,7 +88,7 @@ def api_add(current_user):
         updated_data=None,
         lat=lat,
         long=long,
-        questions=None,
+        question=[],
         category=category
     )
     # insert user
@@ -108,10 +107,10 @@ def api_add(current_user):
     if not os.path.exists(dir):
         os.mkdir(dir)
 
-    image.image1 = image.category+"/"+str(image.image_id)+'.'+file1.filename.split('.')[1]
-    image.image2 = image.category+"/"+str(image.image_id)+'.'+file1.filename.split('.')[1]
+    image.image1 = image.category+"/"+str(image.image_id)+'0.'+file1.filename.split('.')[1]
+    image.image2 = image.category+"/"+str(image.image_id)+'1.'+file1.filename.split('.')[1]
     file1.save("temp/"+image.image1)
-    file1.save("temp/"+image.image2)
+    file2.save("temp/"+image.image2)
     boto3.resource('s3').Bucket('plantyai-api').upload_file("temp/"+image.image1, image.image1,
                                                             ExtraArgs={"ContentType": 'image/jpeg'})
     boto3.resource('s3').Bucket('plantyai-api').upload_file("temp/"+image.image2, image.image2,
@@ -188,7 +187,7 @@ def api_get(current_user):
         link2 = boto3.client('s3').generate_presigned_url('get_object',
                                                           Params={'Bucket': 'plantyai-api', 'Key': image.image2},
                                                           ExpiresIn=120)
-        for question in image.questions:
+        for question in image.question:
             questions.append({
                 'question': question.question,
                 'answer': question.answer
