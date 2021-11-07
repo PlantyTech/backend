@@ -24,7 +24,7 @@ def api_all(current_user):
         link = [boto3.client('s3').generate_presigned_url('get_object',
                                                           Params={'Bucket': 'plantyai-api', 'Key': image_i},
                                                           ExpiresIn=120)
-                for image_i in image.image]
+                for image_i in image.image["image"]]
 
         output.append({
             'image_id': image.image_id,
@@ -56,13 +56,13 @@ def api_add(current_user):
         else:
             data = json.loads(request.data)
         file = [request.files["image"+str(i)] for i in range(int(data.get('image_number')))]  # to check if this is ok
-    except Exception as e:
+    except:
         return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
     user_id = current_user.user_id
-    image = []
+    image = {}
     category = data.get('category')
-    orientation = [data.get('orientation'+str(i)) for i in range(int(data.get('image_number')))]
+    orientation = {"orientation": [data.get('orientation'+str(i)) for i in range(int(data.get('image_number')))]}
     created_data = datetime.now()
     lat = data.get('lat')
     long = data.get('long')
@@ -90,8 +90,8 @@ def api_add(current_user):
     if not os.path.exists(dir):
         os.mkdir(dir)
 
-    image.image = [image.category+"/"+str(image.image_id)+'.'+file_i.filename.split('.')[1] for file_i in file]
-    for i, image_i in enumerate(image.image):
+    image.image = {"image": [image.category+"/"+str(image.image_id)+'.'+file_i.filename.split('.')[1] for file_i in file]}
+    for i, image_i in enumerate(image.image["image"]):
         filepath=image_i
         file[i].save("temp/"+filepath)
         boto3.resource('s3').Bucket('plantyai-api').upload_file("temp/"+filepath, filepath,
@@ -166,7 +166,7 @@ def api_get(current_user):
         link = [boto3.client('s3').generate_presigned_url('get_object',
                                                           Params={'Bucket': 'plantyai-api', 'Key': image_i},
                                                           ExpiresIn=120)
-                for image_i in image.image]
+                for image_i in image.image["image"]]
 
         output.append({
             'image_id': image.image_id,
