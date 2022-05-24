@@ -4,7 +4,8 @@ import json
 from login import token_required
 from models import Image, Notification, User, Question
 from datetime import datetime
-from app import db, sendPush
+from app import db, sendPush, detection_function
+from detection import detection_prediction
 image = Blueprint('image', __name__)
 import boto3
 import os
@@ -46,6 +47,9 @@ def api_all(current_user):
             'updated_data': image.updated_data,
             'lat': image.lat,
             'long': image.long,
+            'leaf_detected': image.leaf_detected,
+            'leaf_set_flag': image.leaf_set_flag,
+            'validated': image.validated,
             'category': image.category,
             'questions': questions
         })
@@ -88,6 +92,9 @@ def api_add(current_user):
         updated_data=None,
         lat=lat,
         long=long,
+        leaf_detected=False,
+        leaf_set_flag=False,
+        validated=False,
         question=[],
         category=category
     )
@@ -111,6 +118,10 @@ def api_add(current_user):
     image.image2 = image.category+"/"+str(image.image_id)+'1.'+file1.filename.split('.')[1]
     file1.save("temp/"+image.image1)
     file2.save("temp/"+image.image2)
+
+    firstImgFlag = detection_prediction("temp/"+image.image1, detection_function)
+    secondImgFlag = detection_prediction("temp/"+image.image2, detection_function)
+
     boto3.resource('s3').Bucket('plantyai-api').upload_file("temp/"+image.image1, image.image1,
                                                             ExtraArgs={"ContentType": 'image/jpeg'})
     boto3.resource('s3').Bucket('plantyai-api').upload_file("temp/"+image.image2, image.image2,
@@ -118,8 +129,10 @@ def api_add(current_user):
     os.remove("temp/"+image.image1)
     os.remove("temp/"+image.image2)
 
+    image.leaf_detected = int(json.loads(str(firstImgFlag | secondImgFlag).lower()))
+
     db.session.commit()
-    return "success"
+    return firstImgFlag | secondImgFlag
 
 
 @image.route('/api/image/update', methods=['POST'])
@@ -145,6 +158,8 @@ def api_update(current_user):
     image.disease = disease
     image.treatment = treatment
     image.updated_data = updated_data
+    image.leaf_set_flag = int(json.loads(str(data.get('leaf_set_flag')).lower()))
+    image.validated = int(json.loads(str(data.get('validated')).lower()))
 
     image_user = User.query.get(image.user_id)
     notification = Notification(
@@ -205,6 +220,9 @@ def api_get(current_user):
             'updated_data': image.updated_data,
             'lat': image.lat,
             'long': image.long,
+            'leaf_detected': image.leaf_detected,
+            'leaf_set_flag': image.leaf_set_flag,
+            'validated': image.validated,
             'category': image.category,
             'questions': questions
         })

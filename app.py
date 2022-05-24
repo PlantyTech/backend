@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 import firebase_admin
 from firebase_admin import credentials, messaging
 from flask_cors import CORS
+import detection
 
 # creates Flask object
 app = Flask(__name__)
@@ -21,7 +22,7 @@ CORS(app, resources={r"/api/*": {"origins": "http://localhost:4200/*"}})
 
 cred = credentials.Certificate('./plantyai-firebase-adminsdk-v8bx3-b11e46feef.json')
 firebase_admin.initialize_app(cred)
-
+detection_function = detection.get_detection_function()
 
 def sendPush(title, msg, registration_token):
     # See documentation on defining a message payload.

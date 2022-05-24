@@ -44,6 +44,9 @@ class Image(db.Model):
     category = db.Column(StringEncryptedType(db.String(80), key), nullable=False)
     lat = db.Column(StringEncryptedType(db.Float(), key))
     long = db.Column(StringEncryptedType(db.Float(), key))
+    leaf_detected = db.Column(StringEncryptedType(db.Boolean, key))
+    leaf_set_flag = db.Column(StringEncryptedType(db.Boolean, key))
+    validated = db.Column(StringEncryptedType(db.Boolean, key))
     question = db.relationship("Question", back_populates="image")
     user = db.relationship("User", back_populates="image")
 
