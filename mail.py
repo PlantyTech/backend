@@ -1,24 +1,86 @@
-from flask import Flask
-from flask_mail import Mail, Message
+from flask_mail import Message
+from app import mail_service
+from flask import Blueprint, make_response
+from flask import request, jsonify
+import json
+import random, string
+from models import User
+from werkzeug.security import generate_password_hash, check_password_hash
+from login import token_required
+mail = Blueprint('mail', __name__)
+password_length = 8
+characters = string.ascii_letters + string.digits + string.punctuation
 
-app = Flask(__name__)
 
-mail_settings = {
-    "MAIL_SERVER": 'smtp.gmail.com',
-    "MAIL_PORT": 465,
-    "MAIL_USE_TLS": False,
-    "MAIL_USE_SSL": True,
-    "MAIL_USERNAME": "plantytech@gmail.com",
-    "MAIL_PASSWORD": "Timi1234!!"
-}
+@mail.route('/api/password/forget', methods=['POST'])
+def _reset_password():
+    try:
+        if request.json is not None:
+            data = request.json
+        elif request.args is not None:
+            data = request.args
+        else:
+            data = json.loads(request.data)
+    except:
+        return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
-app.config.update(mail_settings)
-mail = Mail(app)
+    user = User.query \
+        .filter_by(email=data.get('email')) \
+        .first()
 
-if __name__ == '__main__':
-    with app.app_context():
-        msg = Message(subject="Hello",
-                      sender="Planty Tech",
-                      recipients=["tofenimarius@yahoo.com"], # replace with your email for testing
-                      body="Nu mai schimba 100 de parole")
-        mail.send(msg)
+    if not user:
+        # returns 404 if user does not exist
+        return make_response(
+            'User not found',
+            404,
+            {'WWW-Authenticate': 'Basic realm ="User does not exist !!"'}
+        )
+    if not user.google:
+        password = "".join(random.sample(characters, password_length))
+        user.password = generate_password_hash(password)
+        msg = Message(subject="Resetare Parola",
+                      sender="PlantyAI",
+                      recipients=[user.email],
+                      body="Salut,\n\nNoua ta parola este:\n"+password+"\n\nPuteti schimba parola din aplicatie\n\n"
+                                                                       "Cu respect,\nEchipa PlantyAI")
+        mail_service.send(msg)
+        return str(True)
+
+    return str(False)
+
+
+@mail.route('/api/password/change', methods=['POST'])
+@token_required
+def change_password(current_user):
+    try:
+        if request.json is not None:
+            data = request.json
+        elif request.args is not None:
+            data = request.args
+        else:
+            data = json.loads(request.data)
+    except:
+        return make_response('Request had bad syntax or was impossible to fulfill', 400)
+
+    user = User.query.get(current_user.user_id)
+
+    if not user:
+        # returns 404 if user does not exist
+        return make_response(
+            'User not found',
+            404,
+            {'WWW-Authenticate': 'Basic realm ="User does not exist !!"'}
+        )
+    if not user.google:
+        old_password = data.get('old_password')
+        new_password = data.get('new_password')
+        if check_password_hash(user.password, old_password):
+            user.password = generate_password_hash(new_password)
+            return str(True)
+
+        return make_response(
+            'Forbidden',
+            403,
+            {'WWW-Authenticate': 'Basic realm ="Wrong Password !!"'}
+        )
+    return str(False)

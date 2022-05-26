@@ -75,26 +75,26 @@ def _login():
             404,
             {'WWW-Authenticate': 'Basic realm ="User does not exist !!"'}
         )
-
-    if check_password_hash(user.password, auth.get('password')):
-        # generates the JWT Token
-        user.push_token = auth.get('push_token')
-        user.last_login = datetime.now()
-        user.os_type = auth.get('os_type')
-        user.language = auth.get('language')
-        db.session.commit()
-        token = jwt.encode({
-            'user_id': user.user_id,
-            'exp': datetime.utcnow() + timedelta(minutes=120)
-        }, app.config['SECRET_KEY'], algorithm="HS256")
-        try:
-            return make_response(jsonify({'token': token.decode(),
-                                          'userDetails': {"name": user.name, "email": user.email, "phone": user.phone,
-                                                          "ta_accept": user.ta_accept}}), 201)
-        except:
-            return make_response(jsonify({'token': token,
-                                          'userDetails': {"name": user.name, "email": user.email, "phone": user.phone,
-                                                          "ta_accept": user.ta_accept}}), 201)
+    if not user.google:
+        if check_password_hash(user.password, auth.get('password')):
+            # generates the JWT Token
+            user.push_token = auth.get('push_token')
+            user.last_login = datetime.now()
+            user.os_type = auth.get('os_type')
+            user.language = auth.get('language')
+            db.session.commit()
+            token = jwt.encode({
+                'user_id': user.user_id,
+                'exp': datetime.utcnow() + timedelta(minutes=120)
+            }, app.config['SECRET_KEY'], algorithm="HS256")
+            try:
+                return make_response(jsonify({'token': token.decode(),
+                                              'userDetails': {"name": user.name, "email": user.email, "phone": user.phone,
+                                                              "ta_accept": user.ta_accept}}), 201)
+            except:
+                return make_response(jsonify({'token': token,
+                                              'userDetails': {"name": user.name, "email": user.email, "phone": user.phone,
+                                                              "ta_accept": user.ta_accept}}), 201)
 
     # returns 403 if password is wrong
     return make_response(
@@ -154,7 +154,8 @@ def _login_with_google():
             email=auth.get('email'),
             password=generate_password_hash("google-password"),
             phone=None,
-            location=None
+            location=None,
+            google=int(json.loads(str(True).lower()))
         )
         # insert user
         db.session.add(user)
@@ -183,7 +184,6 @@ def _login_with_google():
         return make_response(jsonify({'token': token,
                                       'userDetails': {"name": user.name, "email": user.email, "phone": user.phone,
                                                       "ta_accept": user.ta_accept}}), 201)
-
 
 
 # signup route
@@ -216,7 +216,8 @@ def signup():
             email=email,
             password=generate_password_hash(password),
             phone=phone,
-            location=location
+            location=location,
+            google=int(json.loads(str(False).lower()))
         )
         # insert user
         db.session.add(user)

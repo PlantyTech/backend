@@ -132,7 +132,7 @@ def api_add(current_user):
     image.leaf_detected = int(json.loads(str(firstImgFlag | secondImgFlag).lower()))
 
     db.session.commit()
-    return firstImgFlag | secondImgFlag
+    return str(firstImgFlag | secondImgFlag)
 
 
 @image.route('/api/image/update', methods=['POST'])
@@ -159,7 +159,7 @@ def api_update(current_user):
     image.treatment = treatment
     image.updated_data = updated_data
     image.leaf_set_flag = int(json.loads(str(data.get('leaf_set_flag')).lower()))
-    image.validated = int(json.loads(str(data.get('validated')).lower()))
+    image.validated = int(json.loads(str(True).lower()))
 
     image_user = User.query.get(image.user_id)
     notification = Notification(

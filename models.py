@@ -23,6 +23,7 @@ class User(db.Model):
     ta_accept = db.Column(StringEncryptedType(db.Boolean, key), default=False)
     os_type = db.Column(StringEncryptedType(db.String(200), key))
     language = db.Column(StringEncryptedType(db.String(200), key))
+    google = db.Column(StringEncryptedType(db.Boolean, key))
     image = db.relationship("Image", back_populates="user")
     notification = db.relationship("Notification", secondary=ItemNotification, back_populates="user")
     order = db.relationship("Order", back_populates="user")

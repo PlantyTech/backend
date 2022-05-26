@@ -6,6 +6,7 @@ from image import image
 from product import product
 from order import order
 from notification import notification
+from mail import mail
 import json
 
 app.register_blueprint(login)
@@ -13,6 +14,7 @@ app.register_blueprint(image)
 app.register_blueprint(product)
 app.register_blueprint(order)
 app.register_blueprint(notification)
+app.register_blueprint(mail)
 
 
 def dict_factory(cursor, row):
