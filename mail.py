@@ -1,5 +1,5 @@
 from flask_mail import Message
-from app import mail_service
+from app import mail_service, db
 from flask import Blueprint, make_response
 from flask import request, jsonify
 import json
@@ -44,6 +44,7 @@ def _reset_password():
                       body="Salut,\n\nNoua ta parola este:\n"+password+"\n\nPuteti schimba parola din aplicatie\n\n"
                                                                        "Cu respect,\nEchipa PlantyAI")
         mail_service.send(msg)
+        db.session.commit()
         return str(True)
 
     return str(False)
@@ -76,6 +77,7 @@ def change_password(current_user):
         new_password = data.get('new_password')
         if check_password_hash(user.password, old_password):
             user.password = generate_password_hash(new_password)
+            db.session.commit()
             return str(True)
 
         return make_response(
