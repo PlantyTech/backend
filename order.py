@@ -2,6 +2,7 @@ from flask import Blueprint, make_response
 from flask import request, jsonify
 import json
 from login import token_required
+from login_admin import token_required_admin
 from models import Order, Ordered_Products, Product, User, Orderdetails
 from datetime import datetime
 from app import db, app
@@ -26,6 +27,28 @@ def api_all(current_user):
         return page_not_found(404)
 
     orders = User.query.get(user_id).order
+
+    output = []
+    for order in orders:
+        output.append({
+            'order_id': order.order_id,
+            'user_id': order.user_id,
+            'total_price': order.total_price,
+            'status': order.status,
+            'created_data': order.created_data,
+            'orderdetails_shipping_id': order.orderdetails_shipping_id,
+            'orderdetails_billing_id': order.orderdetails_billing_id,
+            'payment_type': order.payment_type
+        })
+
+    return jsonify({'order': output})
+
+
+@order.route('/admin/order/all', methods=['GET'])
+@token_required_admin
+def api_all_admin(*_):
+
+    orders = Order.query.all()
 
     output = []
     for order in orders:
@@ -94,9 +117,9 @@ def api_add(current_user):
     return make_response('Success following a POST command', 201)
 
 
-@order.route('/api/order/update', methods=['POST'])
-@token_required
-def api_update(current_user):
+@order.route('/admin/order/update', methods=['POST'])
+@token_required_admin
+def api_update_admin(*_):
     try:
         if request.json is not None:
             data = request.json
@@ -124,7 +147,43 @@ def api_update(current_user):
 
 @order.route('/api/ordered_products/all', methods=['GET'])
 @token_required
-def api_ordered_all(current_user):
+def api_ordered_all(*_):
+    try:
+        if request.json is not None:
+            data = request.json
+        elif request.args is not None:
+            data = request.args
+        else:
+            data = json.loads(request.data)
+    except:
+        return make_response('Request had bad syntax or was impossible to fulfill', 400)
+
+    order_id = data.get('order_id')
+
+    db.session.commit()
+
+    if not (id or order_id):
+        return page_not_found(404)
+
+    ordered_products = Order.query.get(order_id).ordered_products
+
+    output = []
+    for ordered_product in ordered_products:
+        product = Product.query.get(ordered_product.product_id)
+        output.append({
+            'name': product.name,
+            'image': product.image,
+            'price': product.price,
+            'provider': product.provider,
+            'quantity': ordered_product.quantity
+        })
+
+    return jsonify({'ordered_products': output})
+
+
+@order.route('/admin/ordered_products/all', methods=['GET'])
+@token_required_admin
+def api_ordered_all_admin(*_):
     try:
         if request.json is not None:
             data = request.json
@@ -249,9 +308,58 @@ def api_order_details_all(current_user):
     return jsonify({'orderdetails': [{"shipping": output_shipping}, {"billing": output_billing}]})
 
 
+@order.route('/admin/order/shipping-details/all', methods=['GET'])
+@token_required_admin
+def api_order_details_all_admin(*_):
+    try:
+        if request.json is not None:
+            data = request.json
+        elif request.args is not None:
+            data = request.args
+        else:
+            data = json.loads(request.data)
+    except:
+        return make_response('Request had bad syntax or was impossible to fulfill', 400)
+
+    user_id = data.get('user_id')
+
+    db.session.commit()
+
+    if not (id or user_id):
+        return page_not_found(404)
+
+    orderdetails_list = User.query.get(user_id).orderdetails
+
+    output_shipping = []
+    output_billing = []
+    for orderdetails in orderdetails_list:
+        obj={
+            'orderdetails_id': orderdetails.orderdetails_id,
+            'user_id': orderdetails.user_id,
+            'order_type': orderdetails.order_type,
+            'email': orderdetails.email,
+            'first_name': orderdetails.first_name,
+            'second_name': orderdetails.second_name,
+            'phone': orderdetails.phone,
+            'county': orderdetails.county,
+            'city': orderdetails.city,
+            'street': orderdetails.street,
+            'number': orderdetails.number,
+            'block': orderdetails.block,
+            'stairs': orderdetails.stairs,
+            'apartment': orderdetails.apartment
+        }
+        if orderdetails.order_type == "0":
+            output_shipping.append(obj)
+        else:
+            output_billing.append(obj)
+
+    return jsonify({'orderdetails': [{"shipping": output_shipping}, {"billing": output_billing}]})
+
+
 @order.route('/api/order/shipping-details/update', methods=['POST'])
 @token_required
-def api_shiping_update(current_user):
+def api_shiping_update(*_):
     try:
         if request.json is not None:
             data = request.json

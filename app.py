@@ -8,7 +8,6 @@ from flask_cors import CORS
 import detection
 from flask_mail import Mail
 import boto3
-import base64
 from botocore.exceptions import ClientError
 import json
 SECRET_KEY = ""
@@ -42,10 +41,10 @@ def get_secret():
             raise e
         elif e.response['Error']['Code'] == 'ResourceNotFoundException':
             raise e
-
-    if 'SecretString' in get_secret_value_response:
-        SECRET_KEY = json.loads(get_secret_value_response['SecretString'])['SECRET_KEY']
-        MAIL_PASSWORD = json.loads(get_secret_value_response['SecretString'])['MAIL_PASSWORD']
+    else:
+        if 'SecretString' in get_secret_value_response:
+            SECRET_KEY = json.loads(get_secret_value_response['SecretString'])['SECRET_KEY']
+            MAIL_PASSWORD = json.loads(get_secret_value_response['SecretString'])['MAIL_PASSWORD']
 
 
 get_secret()

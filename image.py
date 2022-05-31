@@ -2,6 +2,7 @@ from flask import Blueprint, make_response
 from flask import request, jsonify
 import json
 from login import token_required
+from login_admin import token_required_admin
 from models import Image, Notification, User, Question
 from datetime import datetime
 from app import db, sendPush, detection_function
@@ -16,9 +17,9 @@ def page_not_found(e):
     return "<h1>404</h1><p>The resource could not be found.</p>", 404
 
 
-@image.route('/api/image/all', methods=['GET'])
-@token_required
-def api_all(current_user):
+@image.route('/admin/image/all', methods=['GET'])
+@token_required_admin
+def api_all_admin(*_):
     images = Image.query.all()
     output = []
     questions = []
@@ -135,9 +136,9 @@ def api_add(current_user):
     return str(firstImgFlag | secondImgFlag)
 
 
-@image.route('/api/image/update', methods=['POST'])
-@token_required
-def api_update(current_user):
+@image.route('/admin/image/update', methods=['POST'])
+@token_required_admin
+def api_update_admin(*_):
     try:
         if request.json is not None:
             data = request.json

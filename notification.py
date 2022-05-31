@@ -2,6 +2,7 @@ from flask import Blueprint, make_response
 from flask import request, jsonify
 import json
 from login import token_required
+from login_admin import token_required_admin
 from models import Notification, User
 from datetime import datetime
 from app import db, sendPush
@@ -14,9 +15,9 @@ def page_not_found(e):
     return "<h1>404</h1><p>The resource could not be found.</p>", 404
 
 
-@notification.route('/api/notification/all', methods=['GET'])
-@token_required
-def api_all(*_):
+@notification.route('/admin/notification/all', methods=['GET'])
+@token_required_admin
+def api_all_admin(*_):
     notifications = Notification.query.all()
     output = []
     for notification in notifications:
@@ -33,9 +34,9 @@ def api_all(*_):
     return jsonify({'notifications': output})
 
 
-@notification.route('/api/notification/add', methods=['POST'])
-@token_required
-def api_add(*_):
+@notification.route('/admin/notification/add', methods=['POST'])
+@token_required_admin
+def api_add_admin(*_):
     try:
         if request.json is not None:
             data = request.json
@@ -73,9 +74,9 @@ def api_add(*_):
     return "success"
 
 
-@notification.route('/api/notification/addall', methods=['POST'])
-@token_required
-def api_addall(*_):
+@notification.route('/admin/notification/addall', methods=['POST'])
+@token_required_admin
+def api_addall_admin(*_):
     try:
         if request.json is not None:
             data = request.json
@@ -113,9 +114,9 @@ def api_addall(*_):
     return "success"
 
 
-@notification.route('/api/notification/update', methods=['POST'])
-@token_required
-def api_update(*_):
+@notification.route('/admin/notification/update', methods=['POST'])
+@token_required_admin
+def api_update_admin(*_):
     try:
         if request.json is not None:
             data = request.json

@@ -2,6 +2,7 @@ from flask import Blueprint, make_response
 from flask import request, jsonify
 import json
 from login import token_required
+from login_admin import token_required_admin
 from models import Product
 from datetime import datetime
 from app import db, app
@@ -15,7 +16,28 @@ def page_not_found(e):
 
 @product.route('/api/product/all', methods=['GET'])
 @token_required
-def api_all(current_user):
+def api_all(*_):
+    products = Product.query.all()
+    output = []
+    for product in products:
+        if product.stock_flag:
+            output.append({
+                'product_id': product.product_id,
+                'producer': product.producer,
+                'name': product.name,
+                'image': product.image,
+                'description': product.description,
+                'price': product.price,
+                'provider': product.provider,
+                'stock': product.stock
+            })
+
+    return jsonify({'product': output})
+
+
+@product.route('/admin/product/all', methods=['GET'])
+@token_required_admin
+def api_all_admin(*_):
     products = Product.query.all()
     output = []
     for product in products:
@@ -36,7 +58,7 @@ def api_all(current_user):
 
 @product.route('/api/product/search', methods=['GET'])
 @token_required
-def api_search(current_user):
+def api_search(*_):
     try:
         if request.json is not None:
             data = request.json
@@ -70,9 +92,45 @@ def api_search(current_user):
     return jsonify({'product': output})
 
 
-@product.route('/api/product/add', methods=['POST'])
-@token_required
-def api_add(current_user):
+@product.route('/admin/product/search', methods=['GET'])
+@token_required_admin
+def api_search_admin(*_):
+    try:
+        if request.json is not None:
+            data = request.json
+        elif request.args is not None:
+            data = request.args
+        else:
+            data = json.loads(request.data)
+    except:
+        return make_response('Request had bad syntax or was impossible to fulfill', 400)
+
+    products = Product.query.all()
+    output = []
+    search = data.get("search")
+    for product in products:
+        if product.stock_flag:
+            if (search in product.producer or
+                    search in product.name or
+                    search in product.description or
+                    search is None):
+                output.append({
+                    'product_id': product.product_id,
+                    'producer': product.producer,
+                    'name': product.name,
+                    'image': product.image,
+                    'description': product.description,
+                    'price': product.price,
+                    'provider': product.provider,
+                    'stock': product.stock
+                })
+
+    return jsonify({'product': output})
+
+
+@product.route('/admin/product/add', methods=['POST'])
+@token_required_admin
+def api_add(*_):
     try:
         if request.json is not None:
             data = request.json
@@ -109,9 +167,9 @@ def api_add(current_user):
     return make_response('Success following a POST command', 201)
 
 
-@product.route('/api/product/update', methods=['POST'])
-@token_required
-def api_update(current_user):
+@product.route('/admin/product/update', methods=['POST'])
+@token_required_admin
+def api_update(*_):
     try:
         if request.json is not None:
             data = request.json

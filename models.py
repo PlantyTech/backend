@@ -30,6 +30,15 @@ class User(db.Model):
     orderdetails = db.relationship("Orderdetails", back_populates="user")
 
 
+class Admin(db.Model):
+    __tablename__ = 'admin'
+    user_id = db.Column(db.String, default=lambda: uuid.uuid4().hex, primary_key=True)
+    name = db.Column(StringEncryptedType(db.String(100), key))
+    password = db.Column(StringEncryptedType(db.String(80), key))
+    role = db.Column(StringEncryptedType(db.String(80), key))
+    last_login = db.Column(StringEncryptedType(db.DateTime, key))
+
+
 class Image(db.Model):
     __tablename__ = 'image'
     image_id = db.Column(db.String, default=lambda: uuid.uuid4().hex, primary_key=True)

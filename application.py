@@ -1,6 +1,7 @@
 from app import app, db
 from login import login, token_required
-from models import User, Image
+from login_admin import login_admin, token_required_admin
+from models import User
 from flask import request, jsonify, make_response
 from image import image
 from product import product
@@ -10,6 +11,7 @@ from mail import mail
 import json
 
 app.register_blueprint(login)
+app.register_blueprint(login_admin)
 app.register_blueprint(image)
 app.register_blueprint(product)
 app.register_blueprint(order)
@@ -52,9 +54,9 @@ def ta_accept(current_user):
 
 # User Database Route
 # this route sends back list of users users
-@app.route('/api/users', methods=['GET'])
-@token_required
-def get_all_users(current_user):
+@app.route('/admin/users', methods=['GET'])
+@token_required_admin
+def get_all_users(*_):
     # querying the database
     # for all the entries in it
     users = User.query.all()

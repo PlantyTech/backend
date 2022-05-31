@@ -2,3 +2,4 @@
 __pycache__/
 plantyai-firebase-adminsdk-v8bx3-b11e46feef.json
 log/
+createDB_admin.py
