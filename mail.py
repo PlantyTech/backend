@@ -66,13 +66,6 @@ def change_password(current_user):
 
     user = User.query.get(current_user.user_id)
 
-    if not user:
-        # returns 404 if user does not exist
-        return make_response(
-            'User not found',
-            404,
-            {'WWW-Authenticate': 'Basic realm ="User does not exist !!"'}
-        )
     if not user.google:
         old_password = data.get('old_password')
         new_password = data.get('new_password')
@@ -82,8 +75,7 @@ def change_password(current_user):
             return str(True)
 
         return make_response(
-            'Forbidden',
-            403,
+            200,
             {'WWW-Authenticate': 'Basic realm ="Wrong Password !!"'}
         )
     return str(False)
