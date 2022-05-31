@@ -8,8 +8,8 @@ from models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from login import token_required
 mail = Blueprint('mail', __name__)
-password_length = 8
-characters = string.ascii_letters + string.digits + string.punctuation
+password_length = 10
+characters = string.ascii_letters
 
 
 @mail.route('/api/password/forget', methods=['POST'])
@@ -36,7 +36,8 @@ def _reset_password():
             {'WWW-Authenticate': 'Basic realm ="User does not exist !!"'}
         )
     if not user.google:
-        password = "".join(random.sample(characters, password_length))
+        password = "".join(random.sample(characters, password_length-3)) + "".join(random.sample(string.punctuation, 1))\
+                   + "".join(random.sample(string.digits, 2))
         user.password = generate_password_hash(password)
         msg = Message(subject="Resetare Parola",
                       sender="PlantyAI",

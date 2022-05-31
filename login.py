@@ -127,7 +127,7 @@ def _login_with_google():
         )
 
     try:
-        idToken=auth.get('idToken')
+        idToken = auth.get('idToken')
         idinfo = id_token.verify_oauth2_token(idToken, requests.Request())
 
         if idinfo['email'] != auth.get('email') or idinfo['sub'] != auth.get('id'):
