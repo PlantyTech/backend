@@ -10,6 +10,7 @@ from flask_mail import Mail
 import boto3
 import base64
 from botocore.exceptions import ClientError
+import json
 SECRET_KEY = ""
 MAIL_PASSWORD = ""
 
@@ -21,8 +22,8 @@ def get_secret():
     global MAIL_PASSWORD
 
     # Create a Secrets Manager client
-    session = boto3.session.Session()
-    client = session.client(
+    #session = boto3.session.Session()
+    client = boto3.client(
         service_name='secretsmanager',
         region_name=region_name
     )
@@ -41,15 +42,14 @@ def get_secret():
             raise e
         elif e.response['Error']['Code'] == 'ResourceNotFoundException':
             raise e
-    else:
-        if 'SECRET_KEY' in get_secret_value_response:
-            SECRET_KEY = get_secret_value_response['SECRET_KEY']
-        if 'MAIL_PASSWORD' in get_secret_value_response:
-            MAIL_PASSWORD = get_secret_value_response['MAIL_PASSWORD']
+
+    if 'SecretString' in get_secret_value_response:
+        SECRET_KEY = json.loads(get_secret_value_response['SecretString'])['SECRET_KEY']
+        MAIL_PASSWORD = json.loads(get_secret_value_response['SecretString'])['MAIL_PASSWORD']
 
 
 get_secret()
-print(SECRET_KEY, MAIL_PASSWORD)
+
 # creates Flask object
 app = Flask(__name__)
 # configuration
