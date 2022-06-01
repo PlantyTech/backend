@@ -332,7 +332,11 @@ def api_order_details_all_admin(*_):
     if not (id or user_id):
         return page_not_found(404)
 
-    orderdetails_list = User.query.get(user_id).orderdetails
+    user = User.query.get(user_id)
+
+    if not user:
+        return "No user"
+    orderdetails_list = user.orderdetails
 
     output_shipping = []
     output_billing = []
