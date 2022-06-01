@@ -29,6 +29,11 @@ def token_required_admin(f):
             current_user = Admin.query \
                 .filter_by(user_id=data['user_id']) \
                 .first()
+            if not current_user:
+                return jsonify({
+                    'message': 'Token is invalid !!'
+                }), 403
+
         except Exception as e:
             print(e)
             return jsonify({
@@ -55,7 +60,7 @@ def _login():
         return make_response('Request had bad syntax or was impossible to fulfill', 400)
 
     if not auth or not auth.get('name') or not auth.get('password'):
-        # returns 401 if any email or / and password is missing
+        # returns 401 if any name or / and password is missing
         return make_response(
             'Could not verify',
             401,
@@ -63,7 +68,7 @@ def _login():
         )
 
     admin = Admin.query \
-        .filter_by(email=auth.get('name')) \
+        .filter_by(name=auth.get('name')) \
         .first()
 
     if not admin:
@@ -83,10 +88,10 @@ def _login():
         }, app.config['SECRET_KEY'], algorithm="HS256")
         try:
             return make_response(jsonify({'token': token.decode(),
-                                          'userDetails': {"name": admin.name}}), 201)
+                                          'userDetails': {"name": admin.name, "role": admin.role}}), 201)
         except:
             return make_response(jsonify({'token': token,
-                                          'userDetails': {"name": admin.name}}), 201)
+                                          'userDetails': {"name": admin.name, "role": admin.role}}), 201)
 
     # returns 403 if password is wrong
     return make_response(

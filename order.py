@@ -201,7 +201,11 @@ def api_ordered_all_admin(*_):
     if not (id or order_id):
         return page_not_found(404)
 
-    ordered_products = Order.query.get(order_id).ordered_products
+    order = Order.query.get(order_id)
+
+    if not order:
+        return "No order"
+    ordered_products = order.ordered_products
 
     output = []
     for ordered_product in ordered_products:

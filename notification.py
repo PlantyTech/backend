@@ -134,7 +134,8 @@ def api_update_admin(*_):
     category = data.get('category')
 
     notification = Notification.query.get(notification_id)
-
+    if not notification:
+        return "No notification"
     if text is not None:
         notification.text = text
     if title is not None:

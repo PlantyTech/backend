@@ -156,6 +156,8 @@ def api_update_admin(*_):
     updated_data = datetime.now()
 
     image = Image.query.get(image_id)
+    if not image:
+        return "No image"
     image.disease = disease
     image.treatment = treatment
     image.updated_data = updated_data

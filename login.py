@@ -31,6 +31,10 @@ def token_required(f):
             current_user = User.query \
                 .filter_by(user_id=data['user_id']) \
                 .first()
+            if not current_user:
+                return jsonify({
+                    'message': 'Token is invalid !!'
+                }), 403
         except Exception as e:
             print(e)
             return jsonify({
