@@ -75,7 +75,6 @@ def change_password(current_user):
             return str(True)
 
         return make_response(
-            200,
-            {'WWW-Authenticate': 'Basic realm ="Wrong Password !!"'}
-        )
+            'Wrong Password',
+            200)
     return str(False)
