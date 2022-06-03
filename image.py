@@ -1,11 +1,12 @@
 from flask import Blueprint, make_response
 from flask import request, jsonify
 import json
+from flask_mail import Message
 from login import token_required
 from login_admin import token_required_admin
 from models import Image, Notification, User, Question
 from datetime import datetime
-from app import db, sendPush, detection_function
+from app import db, sendPush, detection_function, mail_service
 from detection import detection_prediction
 image = Blueprint('image', __name__)
 import boto3
@@ -179,6 +180,14 @@ def api_update_admin(*_):
     db.session.commit()
     registration_token = [user_it.push_token for user_it in [image_user] if user_it.push_token]
     sendPush(title=notification.title, msg=notification.text, registration_token=registration_token)
+
+    msg = Message(subject="Noutati despre o imagine adaugata",
+                  sender="PlantyAI",
+                  recipients=[image_user.email],
+                  body="Buna ziua,\n\nAvem noutati despre poza din categoria " + image.category + " din data "
+                       + image.created_data.strftime("%d/%m/%Y, %H:%M") + ".\n Intra sa verifici in aplicatie\n\n"
+                                                                          "Cu respect,\nEchipa PlantyAI")
+    mail_service.send(msg)
 
     return "success"
 

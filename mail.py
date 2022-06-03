@@ -1,9 +1,10 @@
 from flask_mail import Message
 from app import mail_service, db
 from flask import Blueprint, make_response
-from flask import request, jsonify
+from flask import request
 import json
-import random, string
+import random
+import string
 from models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from login import token_required

@@ -114,6 +114,33 @@ def api_addall_admin(*_):
     return "success"
 
 
+@notification.route('/api/notification/update', methods=['POST'])
+@token_required
+def api_update(*_):
+    try:
+        if request.json is not None:
+            data = request.json
+        elif request.args is not None:
+            data = request.args
+        else:
+            data = json.loads(request.data)
+    except:
+        return make_response('Request had bad syntax or was impossible to fulfill', 400)
+
+    notification_id = data.get('notification_id')
+    read_flag = data.get('read_flag')
+
+    notification = Notification.query.get(notification_id)
+    if not notification:
+        return "No notification"
+    if read_flag is not None:
+        notification.read_flag = int(json.loads(str(read_flag).lower()))
+
+    db.session.commit()
+
+    return "success"
+
+
 @notification.route('/admin/notification/update', methods=['POST'])
 @token_required_admin
 def api_update_admin(*_):
