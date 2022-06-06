@@ -148,6 +148,7 @@ class Orderdetails(db.Model):
     block = db.Column(StringEncryptedType(db.String(30), key))
     stairs = db.Column(StringEncryptedType(db.String(30), key))
     apartment = db.Column(StringEncryptedType(db.String(30), key))
+    deleted_flag = db.Column(StringEncryptedType(db.Boolean, key), default=False)
     user = db.relationship("User", back_populates="orderdetails")
 
 
