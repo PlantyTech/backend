@@ -6,7 +6,7 @@ from login import token_required
 from login_admin import token_required_admin
 from models import Image, Notification, User, Question
 from datetime import datetime
-from app import db, sendPush, detection_function, mail_service
+from app import db, sendPush, detection_function, mail_service, app
 from detection import detection_prediction
 image = Blueprint('image', __name__)
 import boto3
@@ -121,8 +121,11 @@ def api_add(current_user):
     file1.save("temp/"+image.image1)
     file2.save("temp/"+image.image2)
 
-    firstImgFlag = detection_prediction("temp/"+image.image1, detection_function)
-    secondImgFlag = detection_prediction("temp/"+image.image2, detection_function)
+    firstImgFlag, firstPred = detection_prediction("temp/"+image.image1, detection_function)
+    secondImgFlag, secondPred = detection_prediction("temp/"+image.image2, detection_function)
+
+    app.logger.debug(image.image1+" : "+str(firstPred))
+    app.logger.debug(image.image2+" : "+str(secondPred))
 
     boto3.resource('s3').Bucket('plantyai-api').upload_file("temp/"+image.image1, image.image1,
                                                             ExtraArgs={"ContentType": 'image/jpeg'})

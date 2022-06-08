@@ -1,5 +1,6 @@
 # flask imports
 from flask import Flask, request, jsonify, make_response
+import logging
 import sqlite3
 from flask_sqlalchemy import SQLAlchemy
 import firebase_admin
@@ -58,6 +59,11 @@ app.config['SECRET_KEY'] = SECRET_KEY
 # database name
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+
+gunicorn_logger = logging.getLogger('gunicorn.error')
+app.logger.handlers = gunicorn_logger.handlers
+app.logger.setLevel(gunicorn_logger.level)
+
 # creates SQLALCHEMY object
 db = SQLAlchemy(app)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:4200/*"},
