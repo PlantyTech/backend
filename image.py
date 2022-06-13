@@ -131,10 +131,10 @@ def api_add(current_user):
     os.remove("temp/"+image.image1)
     os.remove("temp/"+image.image2)
 
-    image.leaf_detected = int(json.loads(str(firstImgFlag | secondImgFlag).lower()))
+    image.leaf_detected = int(json.loads(str(firstImgFlag or secondImgFlag).lower()))
 
     db.session.commit()
-    return str(firstImgFlag | secondImgFlag)
+    return str(firstImgFlag or secondImgFlag)
 
 
 @image.route('/admin/image/update', methods=['POST'])
@@ -189,7 +189,7 @@ def api_update_admin(*_):
                                                                           "Cu respect,\nEchipa PlantyAI")
     mail_service.send(msg)
 
-    return "success"
+    return make_response('Success', 200)
 
 
 @image.route('/api/image/get', methods=['GET'])

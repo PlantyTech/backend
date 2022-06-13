@@ -61,7 +61,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 # creates SQLALCHEMY object
 db = SQLAlchemy(app)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:4200/*"},
-                     r"/admin/*": {"origins": "http://localhost:4200/*"}})
+                     r"/admin/*": {"origins": "http://planty-ai-web.s3-website.eu-central-1.amazonaws.com/*",
+                                   "dev": "http://localhost:4200/*"}})
 
 cred = credentials.Certificate('./plantyai-firebase-adminsdk-v8bx3-b11e46feef.json')
 firebase_admin.initialize_app(cred)
