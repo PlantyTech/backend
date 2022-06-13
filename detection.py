@@ -8,7 +8,7 @@ for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
 
 PATH_TO_MODEL_DIR = './detection-AI/'
-MIN_CONF_THRESH = float(0.50)
+MIN_CONF_THRESH = float(0.60)
 PATH_TO_SAVED_MODEL = PATH_TO_MODEL_DIR + "/saved_model"
 
 
@@ -21,7 +21,6 @@ def get_detection_function():
 
 
 def detection_prediction(image_path, detect_fn):
-    print('Running inference for {}... '.format(image_path), end='')
     image = cv2.imread(image_path)
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     if image_rgb.shape[1] > 1280:
@@ -38,12 +37,11 @@ def detection_prediction(image_path, detect_fn):
     detections = detect_fn(input_tensor)
 
     detection_flag = False
-
+    prediction = 0
     for index, leaf in enumerate(detections['detection_classes'][0].numpy()):
         if leaf == 1:
             if detections['detection_scores'][0].numpy()[index] > MIN_CONF_THRESH:
                 detection_flag = True
-            else:
+                prediction = detections['detection_scores'][0].numpy()[index]
                 break
-    return detection_flag
-
+    return (detection_flag, prediction)
