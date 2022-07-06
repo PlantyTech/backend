@@ -82,6 +82,13 @@ def _login():
             404,
             {'WWW-Authenticate': 'Basic realm ="User does not exist !!"'}
         )
+
+    if not user.validated:
+        return make_response(
+            'Could not verify',
+            401,
+            {'WWW-Authenticate': 'Basic realm ="Email confirmation required !!"'})
+
     if not user.google:
         if check_password_hash(user.password, auth.get('password')):
             # generates the JWT Token
@@ -270,8 +277,14 @@ def confirm_email(token):
             .filter_by(email=email) \
             .first()
         if user:
+            if user.validated:
+                return '<h1>Adresa de email a fost deja validata cu succes!\n\nVa multumim,\nEchipa PlantyAI</h1>'
+
             user.validated = int(json.loads(str(True).lower()))
             db.session.commit()
+        else:
+            return '<h1>Ne Pare rau dar nu gasim acest cont! ' \
+                   'Este posibil sa fi trecut prea mult timp de la crearea lui</h1>'
     except SignatureExpired:
         return '<h1>Tokenul a expirat!</h1>'
-    return '<h1>Adresa de email a fost validata cu succes!</h1>'
+    return '<h1>Adresa de email a fost validata cu succes!\n\nVa multumim,\nEchipa PlantyAI<</h1>'
