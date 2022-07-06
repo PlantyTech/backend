@@ -13,6 +13,7 @@ from botocore.exceptions import ClientError
 import json
 SECRET_KEY = ""
 MAIL_PASSWORD = ""
+SERVER_NAME = "https://plantyai-api-cert.plantyai-api.com/"
 
 
 def get_secret():
@@ -56,6 +57,8 @@ app = Flask(__name__)
 # NEVER HARDCODE YOUR CONFIGURATION IN YOUR CODE
 # INSTEAD CREATE A .env FILE AND STORE IN IT
 app.config['SECRET_KEY'] = SECRET_KEY
+app.config['SERVER_NAME'] = SERVER_NAME
+
 # database name
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
