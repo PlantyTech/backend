@@ -235,7 +235,7 @@ def signup():
 
         msg = Message('Confirm Email', sender='PlantyAI', recipients=[email])
 
-        link = url_for('confirm_email', token=token, _external=True)
+        link = url_for('login.confirm_email', token=token, _external=True)
 
         msg.body = 'Buna ziua,\n\nPentru a confirma contul creat pe aplicatia PlantyAI faceti click pe urmatorul ' \
                    'link: {} \n\nIn cazul in care nu ati creat dumneavoastra acest cont va rugam sa ignorati' \
