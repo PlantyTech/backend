@@ -24,6 +24,8 @@ class User(db.Model):
     os_type = db.Column(StringEncryptedType(db.String(200), key))
     language = db.Column(StringEncryptedType(db.String(200), key))
     google = db.Column(StringEncryptedType(db.Boolean, key))
+    validated = db.Column(StringEncryptedType(db.Boolean, key), default=False)
+    created_data = db.Column(StringEncryptedType(db.DateTime, key))
     image = db.relationship("Image", back_populates="user")
     notification = db.relationship("Notification", secondary=ItemNotification, back_populates="user")
     order = db.relationship("Order", back_populates="user")

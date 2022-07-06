@@ -1,16 +1,19 @@
 from flask import Blueprint
-from flask import Flask, request, jsonify, make_response
+from flask import request, jsonify, make_response, url_for
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from datetime import datetime, timedelta
 from models import User
-from app import db, app
+from app import db, app, mail_service
+from flask_mail import Message
 from functools import wraps
 from google.oauth2 import id_token
 from google.auth.transport import requests
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
 login = Blueprint('login', __name__)
+s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 
 # decorator for verifying the JWT
@@ -221,13 +224,53 @@ def signup():
             password=generate_password_hash(password),
             phone=phone,
             location=location,
-            google=int(json.loads(str(False).lower()))
+            google=int(json.loads(str(False).lower())),
+            created_data=datetime.now()
         )
         # insert user
         db.session.add(user)
         db.session.commit()
 
+        token = s.dumps(email, salt='email-confirm')
+
+        msg = Message('Confirm Email', sender='PlantyAI', recipients=[email])
+
+        link = url_for('confirm_email', token=token, _external=True)
+
+        msg.body = 'Buna ziua,\n\nPentru a confirma contul creat pe aplicatia PlantyAI faceti click pe urmatorul ' \
+                   'link: {} \n\nIn cazul in care nu ati creat dumneavoastra acest cont va rugam sa ignorati' \
+                   ' acest email.\n\nVa multumim,\nEchipa PlantyAI'.format(link)
+
+        mail_service.send(msg)
+
         return make_response('Successfully registered.', 201)
     else:
-        # returns 202 if user already exists
+        if not user.validated:
+            token = s.dumps(email, salt='email-confirm')
+
+            msg = Message('Confirm Email', sender='PlantyAI', recipients=[email])
+
+            link = url_for('login.confirm_email', token=token, _external=True)
+
+            msg.body = 'Buna ziua,\n\nPentru a confirma contul creat pe aplicatia PlantyAI faceti click pe urmatorul ' \
+                       'link: {} \n\nIn cazul in care nu ati creat dumneavoastra acest cont va rugam sa ignorati' \
+                       ' acest email.\n\nVa multumim,\nEchipa PlantyAI'.format(link)
+
+            mail_service.send(msg)
+
         return make_response('User already exists. Please Log in.', 409)
+
+
+@login.route('/confirm_email/<token>')
+def confirm_email(token):
+    try:
+        email = s.loads(token, salt='email-confirm', max_age=3600*72)
+        user = User.query \
+            .filter_by(email=email) \
+            .first()
+        if user:
+            user.validated = int(json.loads(str(True).lower()))
+            db.session.commit()
+    except SignatureExpired:
+        return '<h1>Tokenul a expirat!</h1>'
+    return '<h1>Adresa de email a fost validata cu succes!</h1>'
