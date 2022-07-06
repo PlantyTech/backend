@@ -1,7 +1,5 @@
-# flask imports
-from flask import Flask, request, jsonify, make_response
+from flask import Flask
 import logging
-import sqlite3
 from flask_sqlalchemy import SQLAlchemy
 import firebase_admin
 from firebase_admin import credentials, messaging
@@ -11,9 +9,14 @@ from flask_mail import Mail
 import boto3
 from botocore.exceptions import ClientError
 import json
+import configparser
 SECRET_KEY = ""
 MAIL_PASSWORD = ""
 
+config = configparser.ConfigParser()
+config.read('config.cfg')
+S3 = config["CONFIG"]["S3"]
+DOMAIN = config["CONFIG"]["DOMAIN"]
 
 def get_secret():
     secret_name = "PlantyAI"
@@ -48,7 +51,7 @@ def get_secret():
             MAIL_PASSWORD = json.loads(get_secret_value_response['SecretString'])['MAIL_PASSWORD']
 
 
-get_secret()
+#get_secret()
 
 # creates Flask object
 app = Flask(__name__)

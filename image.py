@@ -6,7 +6,7 @@ from login import token_required
 from login_admin import token_required_admin
 from models import Image, Notification, User, Question
 from datetime import datetime
-from app import db, sendPush, detection_function, mail_service, app
+from app import db, sendPush, detection_function, mail_service, app, S3
 from detection import detection_prediction
 image = Blueprint('image', __name__)
 import boto3
@@ -26,10 +26,10 @@ def api_all_admin(*_):
     questions = []
     for image in images:
         link1 = boto3.client('s3').generate_presigned_url('get_object',
-                                                          Params={'Bucket': 'plantyai-api', 'Key': image.image1},
+                                                          Params={'Bucket': S3, 'Key': image.image1},
                                                           ExpiresIn=120)
         link2 = boto3.client('s3').generate_presigned_url('get_object',
-                                                          Params={'Bucket': 'plantyai-api', 'Key': image.image2},
+                                                          Params={'Bucket': S3, 'Key': image.image2},
                                                           ExpiresIn=120)
         for question in image.question:
             questions.append({
@@ -127,9 +127,9 @@ def api_add(current_user):
     app.logger.debug(image.image1+" : "+str(firstPred))
     app.logger.debug(image.image2+" : "+str(secondPred))
 
-    boto3.resource('s3').Bucket('plantyai-api').upload_file("temp/"+image.image1, image.image1,
+    boto3.resource('s3').Bucket(S3).upload_file("temp/"+image.image1, image.image1,
                                                             ExtraArgs={"ContentType": 'image/jpeg'})
-    boto3.resource('s3').Bucket('plantyai-api').upload_file("temp/"+image.image2, image.image2,
+    boto3.resource('s3').Bucket(S3).upload_file("temp/"+image.image2, image.image2,
                                                             ExtraArgs={"ContentType": 'image/jpeg'})
     os.remove("temp/"+image.image1)
     os.remove("temp/"+image.image2)
@@ -212,10 +212,10 @@ def api_get(current_user):
     questions = []
     for image in images:
         link1 = boto3.client('s3').generate_presigned_url('get_object',
-                                                          Params={'Bucket': 'plantyai-api', 'Key': image.image1},
+                                                          Params={'Bucket': S3, 'Key': image.image1},
                                                           ExpiresIn=120)
         link2 = boto3.client('s3').generate_presigned_url('get_object',
-                                                          Params={'Bucket': 'plantyai-api', 'Key': image.image2},
+                                                          Params={'Bucket': S3, 'Key': image.image2},
                                                           ExpiresIn=120)
         for question in image.question:
             questions.append({

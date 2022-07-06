@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from datetime import datetime, timedelta
 from models import User
-from app import db, app, mail_service
+from app import db, app, mail_service, DOMAIN
 from flask_mail import Message
 from functools import wraps
 from google.oauth2 import id_token
@@ -236,6 +236,7 @@ def signup():
         msg = Message('Confirm Email', sender='PlantyAI', recipients=[email])
 
         link = url_for('login.confirm_email', token=token, _external=True)
+        link = link.replace("127.0.0.1:8000", DOMAIN)
 
         msg.body = 'Buna ziua,\n\nPentru a confirma contul creat pe aplicatia PlantyAI faceti click pe urmatorul ' \
                    'link: {} \n\nIn cazul in care nu ati creat dumneavoastra acest cont va rugam sa ignorati' \
@@ -251,7 +252,7 @@ def signup():
             msg = Message('Confirm Email', sender='PlantyAI', recipients=[email])
 
             link = url_for('login.confirm_email', token=token, _external=True)
-
+            link = link.replace("127.0.0.1:8000", DOMAIN)
             msg.body = 'Buna ziua,\n\nPentru a confirma contul creat pe aplicatia PlantyAI faceti click pe urmatorul ' \
                        'link: {} \n\nIn cazul in care nu ati creat dumneavoastra acest cont va rugam sa ignorati' \
                        ' acest email.\n\nVa multumim,\nEchipa PlantyAI'.format(link)
