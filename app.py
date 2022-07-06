@@ -51,7 +51,7 @@ def get_secret():
             MAIL_PASSWORD = json.loads(get_secret_value_response['SecretString'])['MAIL_PASSWORD']
 
 
-#get_secret()
+get_secret()
 
 # creates Flask object
 app = Flask(__name__)
