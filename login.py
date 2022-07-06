@@ -278,13 +278,13 @@ def confirm_email(token):
             .first()
         if user:
             if user.validated:
-                return '<h1>Adresa de email a fost deja validata cu succes!\n\nVa multumim,\nEchipa PlantyAI</h1>'
+                return '<h1>Adresa de email a fost deja validata cu succes!</h1>\n\nVa multumim,\nEchipa PlantyAI'
 
             user.validated = int(json.loads(str(True).lower()))
             db.session.commit()
         else:
-            return '<h1>Ne Pare rau dar nu gasim acest cont! ' \
-                   'Este posibil sa fi trecut prea mult timp de la crearea lui</h1>'
+            return '<h1>Ne Pare rau dar nu gasim acest cont!</h1> ' \
+                   '\n\nEste posibil sa fi trecut prea mult timp de la crearea lui!'
     except SignatureExpired:
         return '<h1>Tokenul a expirat!</h1>'
-    return '<h1>Adresa de email a fost validata cu succes!\n\nVa multumim,\nEchipa PlantyAI<</h1>'
+    return '<h1>Adresa de email a fost validata cu succes!</h1>\n\nVa multumim,\nEchipa PlantyAI'
