@@ -30,14 +30,45 @@ def api_all(current_user):
 
     output = []
     for order in orders:
+        output_shipping = Orderdetails.query.get(order.orderdetails_shipping_id)
+        output_billing = Orderdetails.query.get(order.orderdetails_billing_id)
         output.append({
             'order_id': order.order_id,
             'user_id': order.user_id,
             'total_price': order.total_price,
             'status': order.status,
             'created_data': order.created_data,
-            'orderdetails_shipping_id': order.orderdetails_shipping_id,
-            'orderdetails_billing_id': order.orderdetails_billing_id,
+            'orderdetails': {
+                "shipping": {
+                    'orderdetails_id': output_shipping.orderdetails_id,
+                    'user_id': output_shipping.user_id,
+                    'order_type': output_shipping.order_type,
+                    'email': output_shipping.email,
+                    'first_name': output_shipping.first_name,
+                    'second_name': output_shipping.second_name,
+                    'phone': output_shipping.phone,
+                    'county': output_shipping.county,
+                    'city': output_shipping.city,
+                    'street': output_shipping.street,
+                    'number': output_shipping.number,
+                    'block': output_shipping.block,
+                    'stairs': output_shipping.stairs,
+                    'apartment': output_shipping.apartment},
+                "billing": {
+                    'orderdetails_id': output_billing.orderdetails_id,
+                    'user_id': output_billing.user_id,
+                    'order_type': output_billing.order_type,
+                    'email': output_billing.email,
+                    'first_name': output_billing.first_name,
+                    'second_name': output_billing.second_name,
+                    'phone': output_billing.phone,
+                    'county': output_billing.county,
+                    'city': output_billing.city,
+                    'street': output_billing.street,
+                    'number': output_billing.number,
+                    'block': output_billing.block,
+                    'stairs': output_billing.stairs,
+                    'apartment': output_billing.apartment}},
             'payment_type': order.payment_type
         })
 
