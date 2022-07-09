@@ -41,17 +41,16 @@ def api_all_admin(*_):
     products = Product.query.all()
     output = []
     for product in products:
-        if product.stock_flag:
-            output.append({
-                'product_id': product.product_id,
-                'producer': product.producer,
-                'name': product.name,
-                'image': product.image,
-                'description': product.description,
-                'price': product.price,
-                'provider': product.provider,
-                'stock': product.stock
-            })
+        output.append({
+            'product_id': product.product_id,
+            'producer': product.producer,
+            'name': product.name,
+            'image': product.image,
+            'description': product.description,
+            'price': product.price,
+            'provider': product.provider,
+            'stock': product.stock
+        })
 
     return jsonify({'product': output})
 
@@ -109,21 +108,20 @@ def api_search_admin(*_):
     output = []
     search = data.get("search")
     for product in products:
-        if product.stock_flag:
-            if (search in product.producer or
-                    search in product.name or
-                    search in product.description or
-                    search is None):
-                output.append({
-                    'product_id': product.product_id,
-                    'producer': product.producer,
-                    'name': product.name,
-                    'image': product.image,
-                    'description': product.description,
-                    'price': product.price,
-                    'provider': product.provider,
-                    'stock': product.stock
-                })
+        if (search in product.producer or
+                search in product.name or
+                search in product.description or
+                search is None):
+            output.append({
+                'product_id': product.product_id,
+                'producer': product.producer,
+                'name': product.name,
+                'image': product.image,
+                'description': product.description,
+                'price': product.price,
+                'provider': product.provider,
+                'stock': product.stock
+            })
 
     return jsonify({'product': output})
 

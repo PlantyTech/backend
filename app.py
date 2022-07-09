@@ -17,6 +17,8 @@ config = configparser.ConfigParser()
 config.read('config.cfg')
 S3 = config["CONFIG"]["S3"]
 DOMAIN = config["CONFIG"]["DOMAIN"]
+ADMIN_CORS = config["CONFIG"]["ADMIN_CORS"]
+CONTACT = config["CONFIG"]["CONTACT"]
 
 def get_secret():
     secret_name = "PlantyAI"
@@ -71,7 +73,7 @@ app.logger.setLevel(gunicorn_logger.level)
 # creates SQLALCHEMY object
 db = SQLAlchemy(app)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:4200/*"},
-                     r"/admin/*": {"origins": "http://planty-ai-web.s3-website.eu-central-1.amazonaws.com/*",
+                     r"/admin/*": {"origins": ADMIN_CORS,
                                    "dev": "http://localhost:4200/*"}})
 
 cred = credentials.Certificate('./plantyai-firebase-adminsdk-v8bx3-b11e46feef.json')

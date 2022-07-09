@@ -5,7 +5,8 @@ from login import token_required
 from login_admin import token_required_admin
 from models import Order, Ordered_Products, Product, User, Orderdetails
 from datetime import datetime
-from app import db, app
+from app import db, mail_service, CONTACT
+from flask_mail import Message
 
 order = Blueprint('order', __name__)
 
@@ -174,6 +175,21 @@ def api_add(current_user):
 
             db.session.add(ordered_product)
             db.session.commit()
+            if CONTACT == "True":
+                msg = Message(subject="Comanda noua!!!",
+                              sender="PlantyAI",
+                              recipients=["contact@plantytech.com"],
+                              body="Comanda noua!!!")
+                mail_service.send(msg)
+            user = User.query.get(user_id)
+            msg = Message(subject="Confirmare comanda",
+                          sender="PlantyAI",
+                          recipients=[user.email],
+                          body="Buna ziua,\n\n"
+                               "Comanda dumneavostra a fost inregistrata cu succes. "
+                               "Ne ocupam de ea cat mai curand posibil.\n\n"
+                               "Cu respect,\nEchipa PlantyAI")
+            mail_service.send(msg)
     except:
         Order.query.filter_by(order_id=order.order_id).delete()
         db.session.commit()
