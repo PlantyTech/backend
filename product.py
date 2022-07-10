@@ -190,11 +190,11 @@ def api_update(*_):
             product.image = data.get('image')
         if data.get('description') is not None and len(data.get('description')) > 0:
             product.description = data.get('description')
-        if data.get('price') is not None and len(data.get('price')) > 0:
+        if data.get('price') is not None and len(str(data.get('price'))) > 0:
             product.price = data.get('price')
         if data.get('provider') is not None and len(data.get('provider')) > 0:
             product.provider = data.get('provider')
-        if data.get('stock') is not None and len(data.get('stock')) > 0:
+        if data.get('stock') is not None and len(str(data.get('stock'))) > 0:
             product.stock = data.get('stock')
         if data.get('stock_flag') is not None and len(data.get('stock_flag')) > 0:
             product.stock_flag = int(json.loads(str(data.get('stock_flag')).lower()))
