@@ -68,6 +68,7 @@ def get_all_users(*_):
         # to the response list
         output.append({
             'name': user.name,
+            'id': user.user_id,
             'email': user.email,
             'phone': user.phone,
             'location': user.location
