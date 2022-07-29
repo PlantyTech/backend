@@ -101,43 +101,49 @@ def api_add(current_user):
         category=category
     )
     # insert user
-    db.session.add(image)
-    db.session.commit()
+    try:
+        db.session.add(image)
+        db.session.commit()
 
-    for i in range(int(data.get('questions_number'))):
-        question = Question(
-            image_id=image.image_id,
-            question=data.get('question'+str(i)),
-            answer=data.get('answer'+str(i))
-        )
-        db.session.add(question)
+        for i in range(int(data.get('questions_number'))):
+            question = Question(
+                image_id=image.image_id,
+                question=data.get('question'+str(i)),
+                answer=data.get('answer'+str(i))
+            )
+            db.session.add(question)
 
-    dir = os.path.join("temp", image.category)
-    if not os.path.exists(dir):
-        os.mkdir(dir)
+        dir = os.path.join("temp", image.category)
+        if not os.path.exists(dir):
+            os.mkdir(dir)
 
-    image.image1 = image.category+"/"+str(image.image_id)+'0.'+file1.filename.split('.')[1]
-    image.image2 = image.category+"/"+str(image.image_id)+'1.'+file1.filename.split('.')[1]
-    file1.save("temp/"+image.image1)
-    file2.save("temp/"+image.image2)
+        image.image1 = image.category+"/"+str(image.image_id)+'0.'+file1.filename.split('.')[1]
+        image.image2 = image.category+"/"+str(image.image_id)+'1.'+file1.filename.split('.')[1]
+        file1.save("temp/"+image.image1)
+        file2.save("temp/"+image.image2)
 
-    firstImgFlag, firstPred = detection_prediction("temp/"+image.image1, detection_function)
-    secondImgFlag, secondPred = detection_prediction("temp/"+image.image2, detection_function)
+        firstImgFlag, firstPred = detection_prediction("temp/"+image.image1, detection_function)
+        secondImgFlag, secondPred = detection_prediction("temp/"+image.image2, detection_function)
 
-    app.logger.debug(image.image1+" : "+str(firstPred))
-    app.logger.debug(image.image2+" : "+str(secondPred))
+        app.logger.debug(image.image1+" : "+str(firstPred))
+        app.logger.debug(image.image2+" : "+str(secondPred))
 
-    boto3.resource('s3').Bucket(S3).upload_file("temp/"+image.image1, image.image1,
-                                                            ExtraArgs={"ContentType": 'image/jpeg'})
-    boto3.resource('s3').Bucket(S3).upload_file("temp/"+image.image2, image.image2,
-                                                            ExtraArgs={"ContentType": 'image/jpeg'})
-    os.remove("temp/"+image.image1)
-    os.remove("temp/"+image.image2)
+        boto3.resource('s3').Bucket(S3).upload_file("temp/"+image.image1, image.image1,
+                                                                ExtraArgs={"ContentType": 'image/jpeg'})
+        boto3.resource('s3').Bucket(S3).upload_file("temp/"+image.image2, image.image2,
+                                                                ExtraArgs={"ContentType": 'image/jpeg'})
+        os.remove("temp/"+image.image1)
+        os.remove("temp/"+image.image2)
 
-    image.leaf_detected = int(json.loads(str(firstImgFlag or secondImgFlag).lower()))
+        image.leaf_detected = int(json.loads(str(firstImgFlag or secondImgFlag).lower()))
 
-    db.session.commit()
-    return str(firstImgFlag or secondImgFlag)
+        db.session.commit()
+        return str(firstImgFlag or secondImgFlag)
+    except:
+        app.logger.debug("eroare la upload imagine pentru userul: "+ image.user_id)
+        Image.query.filter_by(image_id=image.image_id).delete()
+        db.session.commit()
+        return "errorrrr!!!!!! image add"
 
 
 @image.route('/admin/image/update', methods=['POST'])
