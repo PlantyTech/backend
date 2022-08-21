@@ -80,7 +80,9 @@ def api_add(current_user):
     orientation2 = data.get('orientation1')
     created_data = datetime.now()
     lat = data.get('lat')
+    lat = lat if isinstance(lat, float) else 0
     long = data.get('long')
+    long = long if isinstance(long, float) else 0
     # database ORM object
     image = Image(
         image1=None,
